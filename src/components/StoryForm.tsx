@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/card";
 import { generateStory } from '@/lib/openai';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/lib/auth';
 
 type FormData = {
   childName: string;
@@ -45,6 +46,7 @@ const StoryForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -78,7 +80,8 @@ const StoryForm = () => {
       navigate('/preview', { 
         state: { 
           story,
-          formData 
+          formData,
+          userId: user?.id 
         } 
       });
     } catch (error) {
