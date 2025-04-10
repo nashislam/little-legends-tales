@@ -27,8 +27,8 @@ const CreateStory = () => {
           .eq('user_id', user.id)
           .single();
           
-        if (data) {
-          // We know data has an id property if it exists
+        if (data && !error) {
+          // We know data has an id property if it exists and there's no error
           setHasPreferences(true);
         }
       } catch (error) {

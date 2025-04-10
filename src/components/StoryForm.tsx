@@ -87,9 +87,9 @@ const StoryForm = () => {
           return;
         }
         
-        if (data) {
-          // Cast data to our UserPreference type to safely access properties
-          const preferences = data as UserPreference;
+        if (data && !error) {
+          // First convert to unknown then to our type to avoid direct casting errors
+          const preferences = data as unknown as UserPreference;
           setFormData({
             childName: preferences.child_name || '',
             childAge: preferences.child_age || '',
@@ -143,9 +143,9 @@ const StoryForm = () => {
       };
       
       let error;
-      if (data) {
-        // Cast data to access id property safely
-        const existingPref = data as { id: string };
+      if (data && !fetchError) {
+        // First convert to unknown then to our type to avoid direct casting errors
+        const existingPref = data as unknown as { id: string };
         // Update existing preferences using type assertion
         const { error: updateError } = await supabase
           .from('user_preferences' as any)
