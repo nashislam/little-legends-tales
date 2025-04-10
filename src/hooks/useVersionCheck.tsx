@@ -50,12 +50,12 @@ export const useVersionCheck = (
             
             // Give the toast time to display before reloading
             setTimeout(() => {
-              // Force reload by bypassing cache
-              window.location.reload(true);
+              // Force reload by clearing the cache
+              window.location.reload();
             }, 2000);
           } else {
-            // Force reload by bypassing cache
-            window.location.reload(true);
+            // Force reload
+            window.location.reload();
           }
         }
       } catch (error) {
