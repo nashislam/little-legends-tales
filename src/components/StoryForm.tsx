@@ -81,7 +81,7 @@ const StoryForm = () => {
         state: { 
           story,
           formData,
-          userId: user?.id 
+          userId: user?.id || null // Allow for anonymous users
         } 
       });
     } catch (error) {

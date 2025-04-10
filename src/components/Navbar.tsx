@@ -34,53 +34,52 @@ const Navbar = () => {
             How It Works
           </Link>
           
+          <Link to="/create">
+            <Button className="bg-legend-blue hover:bg-blue-500 text-white rounded-full px-6">
+              Create Story
+            </Button>
+          </Link>
+          
           {user ? (
-            <>
-              <Link to="/create">
-                <Button className="bg-legend-blue hover:bg-blue-500 text-white rounded-full px-6">
-                  Create Story
-                </Button>
-              </Link>
-              
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Avatar className="cursor-pointer">
-                    <AvatarFallback className="bg-legend-blue text-white">
-                      {getInitials(user.email || 'User')}
-                    </AvatarFallback>
-                  </Avatar>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem className="flex items-center gap-2">
-                    <User className="h-4 w-4" />
-                    <span>{user.email}</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem 
-                    className="flex items-center gap-2 text-red-600" 
-                    onClick={() => signOut()}
-                  >
-                    <LogOut className="h-4 w-4" />
-                    <span>Logout</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Avatar className="cursor-pointer">
+                  <AvatarFallback className="bg-legend-blue text-white">
+                    {getInitials(user.email || 'User')}
+                  </AvatarFallback>
+                </Avatar>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem className="flex items-center gap-2">
+                  <User className="h-4 w-4" />
+                  <span>{user.email}</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  className="flex items-center gap-2 text-red-600" 
+                  onClick={() => signOut()}
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span>Logout</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           ) : (
             <Link to="/auth">
-              <Button className="bg-legend-blue hover:bg-blue-500 text-white rounded-full px-6">
+              <Button variant="outline" className="rounded-full px-6">
                 Login
               </Button>
             </Link>
           )}
         </div>
         
-        {user ? (
-          <div className="md:hidden flex items-center gap-2">
-            <Link to="/create">
-              <Button className="bg-legend-blue hover:bg-blue-500 text-white rounded-full">
-                Create
-              </Button>
-            </Link>
+        <div className="md:hidden flex items-center gap-2">
+          <Link to="/create">
+            <Button className="bg-legend-blue hover:bg-blue-500 text-white rounded-full">
+              Create
+            </Button>
+          </Link>
+          
+          {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Avatar className="cursor-pointer">
@@ -99,14 +98,14 @@ const Navbar = () => {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-          </div>
-        ) : (
-          <Link to="/auth" className="md:hidden">
-            <Button className="bg-legend-blue hover:bg-blue-500 text-white rounded-full">
-              Login
-            </Button>
-          </Link>
-        )}
+          ) : (
+            <Link to="/auth" className="md:hidden">
+              <Button variant="outline" className="rounded-full">
+                Login
+              </Button>
+            </Link>
+          )}
+        </div>
       </div>
     </nav>
   );
