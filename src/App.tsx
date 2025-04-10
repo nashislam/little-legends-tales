@@ -25,14 +25,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/create" element={<CreateStory />} />
-            <Route 
-              path="/preview" 
-              element={
-                <ProtectedRoute>
-                  <StoryPreview />
-                </ProtectedRoute>
-              } 
-            />
+            <Route path="/preview" element={<StoryPreview />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
