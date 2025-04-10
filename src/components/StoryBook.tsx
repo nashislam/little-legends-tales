@@ -5,6 +5,8 @@ import { cn } from "@/lib/utils";
 import NavigationControls from './storybook/NavigationControls';
 import Page from './storybook/Page';
 import MobilePageCard from './storybook/MobilePageCard';
+import { Book, Maximize2, Minimize2 } from 'lucide-react';
+import { Button } from "@/components/ui/button";
 
 interface Page {
   content: string;
@@ -22,6 +24,7 @@ const StoryBook = ({ childName, pages, artStyle }: StoryBookProps) => {
   const [currentPage, setCurrentPage] = useState(0);
   const [loadedPages, setLoadedPages] = useState<Page[]>([]);
   const [loading, setLoading] = useState<boolean[]>([]);
+  const [fullscreen, setFullscreen] = useState(false);
   const totalPages = pages.length;
 
   useEffect(() => {
@@ -112,47 +115,85 @@ const StoryBook = ({ childName, pages, artStyle }: StoryBookProps) => {
   
   // Determine if we're on the title page (first page)
   const isTitlePage = currentPage === 0;
+  
+  const toggleFullscreen = () => {
+    setFullscreen(!fullscreen);
+  };
 
   return (
     <div className="flex flex-col items-center">
-      {/* Book title */}
-      <h1 className="text-2xl md:text-3xl font-display mb-4 text-legend-blue">
-        {childName}'s Magical Adventure
-      </h1>
-      <p className="text-gray-500 italic mb-6">
-        Art style: {artStyle}
-      </p>
-      
-      {/* Book container with rounded corners and shading to look book-like */}
-      <div className="relative w-full max-w-3xl aspect-[3/2] bg-[#FFF9F5] rounded-lg shadow-lg mb-8 overflow-hidden border-2 border-[#E6D7CC]">
-        {/* Page counter */}
-        <div className="absolute top-2 right-2 bg-white/80 text-gray-500 px-2 py-1 rounded-md text-xs">
-          Page {currentPage + 1} of {totalPages}
+      <div className={cn(
+        "transition-all duration-500 w-full",
+        fullscreen ? "fixed inset-0 z-50 bg-blue-50" : ""
+      )}>
+        {/* Book header with controls */}
+        <div className="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200 shadow-sm">
+          <div className="flex items-center">
+            <Book size={18} className="text-legend-blue mr-2" />
+            <h2 className="text-lg font-display text-gray-700">
+              {childName}'s Magical Adventure
+            </h2>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-500">
+              {currentPage + 1} of {totalPages}
+            </span>
+            <Button 
+              variant="ghost" 
+              size="icon"
+              onClick={toggleFullscreen}
+              className="rounded-full h-8 w-8"
+            >
+              {fullscreen ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
+            </Button>
+          </div>
         </div>
         
-        {/* Current page content */}
-        <Page
-          content={loadedPages[currentPage]?.content || pages[currentPage]?.content}
-          image={loadedPages[currentPage]?.image}
-          imageError={loadedPages[currentPage]?.imageError}
-          loading={loading[currentPage]}
-          currentPage={currentPage}
-          isTitlePage={isTitlePage}
-          childName={childName}
-          onRetryImage={retryImageGeneration}
-        />
-        
-        {/* Navigation buttons */}
-        <NavigationControls 
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPrevPage={prevPage}
-          onNextPage={nextPage}
-        />
+        {/* Book container with rounded corners and book-like appearance */}
+        <div className={cn(
+          "mx-auto bg-gradient-to-b from-[#F9F5F2] to-[#F5EFE9] transition-all duration-300",
+          "rounded-lg overflow-hidden book-container",
+          fullscreen 
+            ? "w-full h-[calc(100vh-104px)] max-w-none" 
+            : "w-full max-w-5xl aspect-[4/3] mt-6 mb-8"
+        )}>
+          <div className={cn(
+            "relative w-full h-full flex flex-col",
+            "shadow-[0_0_40px_rgba(0,0,0,0.05)_inset,_0_0_0_1px_rgba(0,0,0,0.03)_inset]"
+          )}>
+            {/* Current page content */}
+            <div className="flex-1 p-4">
+              <Page
+                content={loadedPages[currentPage]?.content || pages[currentPage]?.content}
+                image={loadedPages[currentPage]?.image}
+                imageError={loadedPages[currentPage]?.imageError}
+                loading={loading[currentPage]}
+                currentPage={currentPage}
+                isTitlePage={isTitlePage}
+                childName={childName}
+                onRetryImage={retryImageGeneration}
+              />
+            </div>
+            
+            {/* Navigation controls */}
+            <div className="px-6 py-2 bg-white/50 backdrop-blur-sm border-t border-[#E6D7CC]">
+              <NavigationControls 
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPrevPage={prevPage}
+                onNextPage={nextPage}
+              />
+            </div>
+          </div>
+        </div>
       </div>
       
       {/* Mobile view with stack layout */}
-      <div className="md:hidden mt-4 space-y-8">
+      <div className={cn(
+        "md:hidden mt-6 space-y-10 pb-10 w-full px-4",
+        fullscreen ? "hidden" : "block"
+      )}>
         {loadedPages.map((page, index) => (
           <MobilePageCard
             key={index}

@@ -2,6 +2,7 @@
 import React from 'react';
 import PageContent from './PageContent';
 import PageIllustration from './PageIllustration';
+import { cn } from '@/lib/utils';
 
 interface PageProps {
   content: string;
@@ -25,9 +26,12 @@ const Page = ({
   onRetryImage
 }: PageProps) => {
   return (
-    <div className="flex h-full">
-      {/* Page content */}
-      <div className="flex-1 p-8 overflow-auto flex flex-col justify-between">
+    <div className="grid grid-cols-1 md:grid-cols-2 h-full board-book-page">
+      {/* Left page - content */}
+      <div className={cn(
+        "bg-[#FFF9F5] rounded-l-3xl p-8 flex flex-col justify-center shadow-inner",
+        "border-r border-[#E6D7CC]"
+      )}>
         <PageContent 
           content={content}
           isTitlePage={isTitlePage}
@@ -35,8 +39,11 @@ const Page = ({
         />
       </div>
       
-      {/* Page illustration */}
-      <div className="flex-1 bg-gray-100 flex items-center justify-center p-4 relative">
+      {/* Right page - illustration */}
+      <div className={cn(
+        "bg-[#FFF9F5] rounded-r-3xl p-6 flex items-center justify-center shadow-inner",
+        "relative overflow-hidden"
+      )}>
         <PageIllustration 
           loading={loading}
           imageError={imageError}

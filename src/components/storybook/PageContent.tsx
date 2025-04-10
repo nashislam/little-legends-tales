@@ -16,24 +16,24 @@ const PageContent = ({ content, isTitlePage, childName }: PageContentProps) => {
     const paragraphs = content.split('\n').filter(p => p.trim() !== '');
     
     return paragraphs.map((paragraph, idx) => (
-      <p key={idx} className="mb-4">{paragraph}</p>
+      <p key={idx} className="mb-5 leading-relaxed">{paragraph}</p>
     ));
   };
 
   if (isTitlePage) {
     return (
-      <div className="h-full flex flex-col items-center justify-center">
-        <h1 className="text-3xl md:text-4xl font-display text-legend-blue mb-6">
-          {childName}'s Magical Adventure
+      <div className="h-full flex flex-col items-center justify-center text-center">
+        <h1 className="text-4xl md:text-5xl font-display text-[#5D5FEF] mb-6 leading-tight">
+          {childName}'s<br/>Magical<br/>Adventure
         </h1>
-        <p className="text-xl font-story text-gray-600 mb-4">A personalized tale of wonder</p>
-        <p className="font-story text-lg text-gray-500 mt-8">Written just for {childName}</p>
+        <div className="w-16 h-1 bg-legend-yellow rounded-full my-4"></div>
+        <p className="text-xl font-story text-gray-600 mt-4">A personalized tale of wonder</p>
       </div>
     );
   }
 
   return (
-    <div className="prose prose-lg max-w-none font-story leading-relaxed text-lg">
+    <div className="prose max-w-none font-story text-xl md:text-2xl leading-relaxed text-[#2D3748]">
       {formatPageContent(content)}
     </div>
   );

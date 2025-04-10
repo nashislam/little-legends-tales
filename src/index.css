@@ -79,6 +79,22 @@
   .storybook-page-number {
     @apply font-story text-sm text-gray-500 text-center mt-4;
   }
+  
+  /* Board book styling */
+  .book-container {
+    box-shadow: 0 10px 50px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.03);
+  }
+  
+  .board-book-page {
+    background-image: 
+      linear-gradient(to right, rgba(0,0,0,0.03) 0px, rgba(0,0,0,0) 1px),
+      radial-gradient(circle at center, rgba(0,0,0,0.01) 0%, rgba(0,0,0,0) 100%);
+    background-size: 20px 100%, cover;
+  }
+  
+  .board-book-page-mobile {
+    background-image: radial-gradient(circle at center, rgba(0,0,0,0.01) 0%, rgba(0,0,0,0) 100%);
+  }
 }
 
 @layer components {
@@ -97,4 +113,39 @@
   .input-field {
     @apply border border-gray-200 rounded-xl p-3 w-full focus:outline-none focus:ring-2 focus:ring-legend-blue;
   }
+}
+
+/* Page turn animation */
+@keyframes pageFlipRight {
+  0% {
+    transform: translateX(0) rotateY(0);
+    transform-origin: left;
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(50%) rotateY(-90deg);
+    transform-origin: left;
+    opacity: 0;
+  }
+}
+
+@keyframes pageFlipLeft {
+  0% {
+    transform: translateX(0) rotateY(0);
+    transform-origin: right;
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-50%) rotateY(90deg);
+    transform-origin: right;
+    opacity: 0;
+  }
+}
+
+.page-enter {
+  animation: pageFlipRight 0.5s forwards;
+}
+
+.page-exit {
+  animation: pageFlipLeft 0.5s forwards;
 }

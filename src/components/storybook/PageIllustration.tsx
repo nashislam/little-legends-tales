@@ -1,8 +1,9 @@
 
 import React from 'react';
-import { Loader2, AlertTriangle } from 'lucide-react';
+import { Loader2, AlertTriangle, RefreshCw } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { cn } from '@/lib/utils';
 
 interface PageIllustrationProps {
   loading: boolean;
@@ -21,35 +22,36 @@ const PageIllustration = ({
 }: PageIllustrationProps) => {
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center text-gray-400">
-        <Loader2 className="h-12 w-12 animate-spin mb-2" />
-        <p>Generating illustration...</p>
+      <div className="flex flex-col items-center justify-center text-gray-400 h-full w-full">
+        <div className="relative">
+          <div className="h-32 w-32 rounded-full bg-[#F7F0EA] flex items-center justify-center">
+            <Loader2 className="h-16 w-16 animate-spin text-legend-blue opacity-70" />
+          </div>
+          <div className="absolute -bottom-2 w-full text-center">
+            <p className="font-story text-sm text-gray-500">Creating picture...</p>
+          </div>
+        </div>
       </div>
     );
   }
   
   if (imageError) {
     return (
-      <div className="flex flex-col items-center justify-center w-full">
-        <Alert variant="destructive" className="mb-4 mx-4">
+      <div className="flex flex-col items-center justify-center w-full h-full">
+        <Alert variant="destructive" className="mb-4 mx-4 bg-white/80 border border-red-100">
           <AlertTriangle className="h-4 w-4 mr-2" />
-          <AlertDescription>
-            Image generation failed
+          <AlertDescription className="font-story">
+            Oops! Our drawing didn't work
           </AlertDescription>
         </Alert>
         
-        <img 
-          src={image} 
-          alt="Placeholder illustration" 
-          className="max-h-[60%] max-w-[60%] object-contain opacity-50"
-        />
-        
         <Button 
           onClick={() => onRetry(pageNumber)} 
-          className="mt-4"
-          variant="outline"
+          className="mt-4 font-story bg-legend-pink hover:bg-pink-500 text-white flex items-center gap-2"
+          size="sm"
         >
-          Retry Image Generation
+          <RefreshCw size={16} />
+          Try drawing again
         </Button>
       </div>
     );
@@ -57,16 +59,21 @@ const PageIllustration = ({
   
   if (image) {
     return (
-      <img 
-        src={image} 
-        alt={`Illustration for page ${pageNumber + 1}`} 
-        className="max-h-full max-w-full object-contain rounded-lg shadow"
-      />
+      <div className="illustration-container w-full h-full flex items-center justify-center overflow-hidden">
+        <img 
+          src={image} 
+          alt={`Illustration for page ${pageNumber + 1}`} 
+          className={cn(
+            "max-h-[85%] max-w-[85%] object-contain rounded-2xl",
+            "shadow-lg transition-all border-4 border-white"
+          )}
+        />
+      </div>
     );
   }
   
   return (
-    <div className="text-gray-400 italic text-center p-4">
+    <div className="text-gray-400 italic text-center font-story p-4">
       [Illustration would appear here]
     </div>
   );
