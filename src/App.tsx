@@ -1,4 +1,5 @@
 
+import { useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -17,10 +18,9 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 
 const queryClient = new QueryClient();
 
-// Add a VersionChecker component to avoid cluttering the main App component
+// Simple version checker component
 const VersionChecker = () => {
-  // Check every 30 seconds (30000ms)
-  useVersionCheck(30000);
+  useVersionCheck();
   return null;
 };
 
@@ -46,7 +46,6 @@ const App = () => (
               } 
             />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>

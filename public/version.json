@@ -1,5 +1,5 @@
 
 {
-  "version": "1.0.0-${Date.now()}",
+  "version": "1.0.0",
   "buildTime": "${new Date().toISOString()}"
 }

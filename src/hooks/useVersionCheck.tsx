@@ -3,24 +3,23 @@ import { useEffect } from 'react';
 import { toast } from '@/components/ui/use-toast';
 
 /**
- * Hook to periodically check for app updates by comparing the current version
+ * Hook to check for app updates by comparing the current version
  * with the version in the version.json file.
  * 
- * @param interval - Interval in milliseconds between checks (default: 30000ms / 30 seconds)
- * @param showToast - Whether to show a toast notification when an update is available (default: true)
+ * @param interval - Interval in milliseconds between checks
+ * @param showToast - Whether to show a toast notification when an update is available
  */
 export const useVersionCheck = (
   interval: number = 30000,
   showToast: boolean = true
 ) => {
   useEffect(() => {
-    // Generate a unique cache-busting parameter
-    const cacheBuster = () => `?_=${new Date().getTime()}`;
+    // Add cache-busting parameter to URL
+    const cacheBuster = () => `?_=${Date.now()}`;
     
-    // Initial version check on mount
     const checkVersion = async () => {
       try {
-        // Force bypass of all caches with cache-busting parameter and fetch options
+        // Force bypass of cache
         const res = await fetch(`/version.json${cacheBuster()}`, {
           cache: 'no-store',
           headers: {
@@ -34,11 +33,11 @@ export const useVersionCheck = (
         const data = await res.json();
         const currentVersion = localStorage.getItem('appVersion');
         
-        // If this is the first load or version has changed
+        // If first load or version has changed
         if (!currentVersion) {
           localStorage.setItem('appVersion', data.version);
         } else if (currentVersion !== data.version) {
-          // Version has changed, update localStorage
+          // Update stored version
           localStorage.setItem('appVersion', data.version);
           
           if (showToast) {
@@ -50,11 +49,9 @@ export const useVersionCheck = (
             
             // Give the toast time to display before reloading
             setTimeout(() => {
-              // Force reload by clearing the cache
               window.location.reload();
             }, 2000);
           } else {
-            // Force reload
             window.location.reload();
           }
         }
@@ -63,13 +60,9 @@ export const useVersionCheck = (
       }
     };
 
-    // Check immediately on mount
+    // Check immediately and set interval
     checkVersion();
-    
-    // Set up interval for periodic checks
     const intervalId = setInterval(checkVersion, interval);
-    
-    // Clean up the interval on unmount
     return () => clearInterval(intervalId);
   }, [interval, showToast]);
 };
