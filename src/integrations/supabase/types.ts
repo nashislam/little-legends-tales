@@ -72,6 +72,45 @@ export type Database = {
         }
         Relationships: []
       }
+      user_preferences: {
+        Row: {
+          child_age: string | null
+          child_name: string | null
+          created_at: string
+          favorite_animal: string | null
+          favorite_characters: string | null
+          id: string
+          preferred_art_style: string | null
+          preferred_magical_power: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          child_age?: string | null
+          child_name?: string | null
+          created_at?: string
+          favorite_animal?: string | null
+          favorite_characters?: string | null
+          id?: string
+          preferred_art_style?: string | null
+          preferred_magical_power?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          child_age?: string | null
+          child_name?: string | null
+          created_at?: string
+          favorite_animal?: string | null
+          favorite_characters?: string | null
+          id?: string
+          preferred_art_style?: string | null
+          preferred_magical_power?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

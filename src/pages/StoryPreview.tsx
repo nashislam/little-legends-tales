@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import StoryBook from "@/components/StoryBook";
 import { splitStoryIntoPages } from "@/lib/storyUtils";
-import { Download } from "lucide-react";
+import { Download, Save, Share } from "lucide-react";
 
 const StoryPreview = () => {
   const location = useLocation();
@@ -20,6 +20,7 @@ const StoryPreview = () => {
   const [story, setStory] = useState<string>("");
   const [formData, setFormData] = useState<any>(null);
   const [storyPages, setStoryPages] = useState<any[]>([]);
+  const [storySaved, setStorySaved] = useState(false);
 
   useEffect(() => {
     if (location.state?.story) {
@@ -34,6 +35,30 @@ const StoryPreview = () => {
       navigate("/create");
     }
   }, [location.state, navigate]);
+
+  // Check if story is already saved on component mount
+  useEffect(() => {
+    const checkStorySaved = async () => {
+      if (!user || !story) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from('stories')
+          .select('id')
+          .eq('user_id', user.id)
+          .eq('content', story)
+          .maybeSingle();
+        
+        if (data) {
+          setStorySaved(true);
+        }
+      } catch (error) {
+        console.error('Error checking saved story:', error);
+      }
+    };
+    
+    checkStorySaved();
+  }, [user, story]);
 
   const handleSaveStory = async () => {
     if (!user) {
@@ -51,7 +76,7 @@ const StoryPreview = () => {
     setSaving(true);
     try {
       const { error } = await supabase
-        .from('stories' as any)
+        .from('stories')
         .insert({
           user_id: user.id,
           content: story,
@@ -61,7 +86,7 @@ const StoryPreview = () => {
           magical_power: formData?.magicalPower || "",
           characters: formData?.characters || "",
           art_style: formData?.artStyle || "",
-        } as any);
+        });
 
       if (error) throw error;
 
@@ -69,6 +94,7 @@ const StoryPreview = () => {
         title: "Story Saved!",
         description: "Your story has been saved to your account.",
       });
+      setStorySaved(true);
     } catch (error) {
       console.error("Error saving story:", error);
       toast({
@@ -122,17 +148,18 @@ const StoryPreview = () => {
               childName={formData?.childName || "Child"} 
               pages={storyPages} 
               artStyle={formData?.artStyle || "watercolor"} 
-              storyText={story} // Pass the full story for consistency analysis
+              storyText={story}
             />
           )}
           
           <div className="flex flex-col md:flex-row justify-center gap-4 mt-8">
             <Button 
               onClick={handleSaveStory}
-              className="bg-legend-blue hover:bg-blue-600 text-white"
-              disabled={saving}
+              className="bg-legend-blue hover:bg-blue-600 text-white flex items-center gap-2"
+              disabled={saving || storySaved}
             >
-              {saving ? "Saving..." : "Save Story"}
+              <Save size={18} />
+              {saving ? "Saving..." : storySaved ? "Story Saved" : "Save Story"}
             </Button>
             
             <Button 
