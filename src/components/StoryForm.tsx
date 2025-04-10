@@ -61,8 +61,9 @@ const StoryForm = () => {
       
       setLoadingPreferences(true);
       try {
+        // Use type assertion to allow accessing user_preferences
         const { data, error } = await supabase
-          .from('user_preferences')
+          .from('user_preferences' as any)
           .select('*')
           .eq('user_id', user.id)
           .single();
@@ -107,8 +108,9 @@ const StoryForm = () => {
     
     setSavingPreferences(true);
     try {
+      // Use type assertion to allow accessing user_preferences
       const { data, error: fetchError } = await supabase
-        .from('user_preferences')
+        .from('user_preferences' as any)
         .select('id')
         .eq('user_id', user.id)
         .single();
@@ -126,17 +128,17 @@ const StoryForm = () => {
       
       let error;
       if (data) {
-        // Update existing preferences
+        // Update existing preferences using type assertion
         const { error: updateError } = await supabase
-          .from('user_preferences')
+          .from('user_preferences' as any)
           .update(preferences)
           .eq('id', data.id);
         error = updateError;
       } else {
-        // Insert new preferences
+        // Insert new preferences using type assertion
         const { error: insertError } = await supabase
-          .from('user_preferences')
-          .insert([preferences]);
+          .from('user_preferences' as any)
+          .insert([preferences] as any);
         error = insertError;
       }
       

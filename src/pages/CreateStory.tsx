@@ -15,8 +15,9 @@ const CreateStory = () => {
       if (!user) return;
       
       try {
+        // Use type assertion to allow accessing user_preferences
         const { data, error } = await supabase
-          .from('user_preferences')
+          .from('user_preferences' as any)
           .select('id')
           .eq('user_id', user.id)
           .single();
