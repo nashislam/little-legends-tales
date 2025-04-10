@@ -59,15 +59,20 @@ const PageIllustration = ({
   
   if (image) {
     return (
-      <div className="illustration-container w-full h-full flex items-center justify-center overflow-hidden">
-        <img 
-          src={image} 
-          alt={`Illustration for page ${pageNumber + 1}`} 
-          className={cn(
-            "max-h-[85%] max-w-[85%] object-contain rounded-2xl",
-            "shadow-lg transition-all border-4 border-white"
-          )}
-        />
+      <div className="illustration-container w-full h-full flex items-center justify-center p-6">
+        <div className="relative w-full h-full flex items-center justify-center">
+          <img 
+            src={image} 
+            alt={`Illustration for page ${pageNumber + 1}`} 
+            className={cn(
+              "max-h-[85%] max-w-[85%] object-contain rounded-3xl",
+              "shadow-[0_10px_25px_-15px_rgba(0,0,0,0.2)] transition-all border-8 border-white"
+            )}
+          />
+          <div className="absolute -bottom-2 right-0 p-2 bg-white/70 backdrop-blur-sm rounded-full px-3 text-xs text-gray-500 font-story">
+            {pageNumber + 1}
+          </div>
+        </div>
       </div>
     );
   }

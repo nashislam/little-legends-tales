@@ -13,6 +13,7 @@ interface PageProps {
   isTitlePage: boolean;
   childName: string;
   onRetryImage: (pageIndex: number) => Promise<void>;
+  isEvenPage: boolean;
 }
 
 const Page = ({ 
@@ -23,34 +24,66 @@ const Page = ({
   currentPage, 
   isTitlePage,
   childName,
-  onRetryImage
+  onRetryImage,
+  isEvenPage
 }: PageProps) => {
+  // Determine the order of content and illustration based on even/odd page
+  const contentFirst = isEvenPage;
+  
+  // Create the book spine/gutter effect
+  const Gutter = () => (
+    <div className="w-6 bg-gradient-to-r from-[#E6D7CC] to-[#F5F0EA] shadow-inner flex flex-col items-center justify-center">
+      <div className="w-[1px] h-2/3 bg-[#0000001a] opacity-30"></div>
+    </div>
+  );
+  
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 h-full board-book-page">
-      {/* Left page - content */}
+    <div className="grid grid-cols-1 md:grid-cols-[1fr,auto,1fr] h-full board-book-page">
+      {/* Left page - can be content or illustration based on even/odd */}
       <div className={cn(
-        "bg-[#FFF9F5] rounded-l-3xl p-8 flex flex-col justify-center shadow-inner",
-        "border-r border-[#E6D7CC]"
-      )}>
-        <PageContent 
-          content={content}
-          isTitlePage={isTitlePage}
-          childName={childName}
-        />
-      </div>
-      
-      {/* Right page - illustration */}
-      <div className={cn(
-        "bg-[#FFF9F5] rounded-r-3xl p-6 flex items-center justify-center shadow-inner",
+        "bg-[#FFF9F5] rounded-l-3xl p-6 flex flex-col justify-center shadow-inner",
         "relative overflow-hidden"
       )}>
-        <PageIllustration 
-          loading={loading}
-          imageError={imageError}
-          image={image}
-          pageNumber={currentPage}
-          onRetry={onRetryImage}
-        />
+        {contentFirst ? (
+          <PageContent 
+            content={content}
+            isTitlePage={isTitlePage}
+            childName={childName}
+          />
+        ) : (
+          <PageIllustration 
+            loading={loading}
+            imageError={imageError}
+            image={image}
+            pageNumber={currentPage}
+            onRetry={onRetryImage}
+          />
+        )}
+      </div>
+      
+      {/* Center gutter/spine */}
+      <Gutter />
+      
+      {/* Right page - can be content or illustration based on even/odd */}
+      <div className={cn(
+        "bg-[#FFF9F5] rounded-r-3xl p-6 flex flex-col justify-center shadow-inner",
+        "relative overflow-hidden"
+      )}>
+        {contentFirst ? (
+          <PageIllustration 
+            loading={loading}
+            imageError={imageError}
+            image={image}
+            pageNumber={currentPage}
+            onRetry={onRetryImage}
+          />
+        ) : (
+          <PageContent 
+            content={content}
+            isTitlePage={isTitlePage}
+            childName={childName}
+          />
+        )}
       </div>
     </div>
   );

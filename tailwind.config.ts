@@ -21,8 +21,8 @@ export default {
 		extend: {
 			fontFamily: {
 				sans: ['"Open Sans"', 'sans-serif'],
-				display: ['"Fredoka One"', 'cursive'],
-				story: ['"Comic Neue"', 'cursive'],
+				display: ['"Fredoka One"', 'Quicksand', 'cursive'],
+				story: ['"Comic Neue"', 'Georgia', 'Nunito', 'serif'],
 			},
 			colors: {
 				border: 'hsl(var(--border))',

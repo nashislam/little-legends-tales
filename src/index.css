@@ -59,7 +59,7 @@
   }
 
   .story-text {
-    @apply font-story text-lg leading-relaxed;
+    @apply font-story text-xl leading-loose;
   }
   
   /* Add more storybook-specific styling */
@@ -73,7 +73,7 @@
   }
 
   .storybook-text {
-    @apply font-story text-lg leading-relaxed tracking-wide;
+    @apply font-story text-xl leading-loose tracking-wide;
   }
 
   .storybook-page-number {
@@ -82,7 +82,7 @@
   
   /* Board book styling */
   .book-container {
-    box-shadow: 0 10px 50px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.03);
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.04);
   }
   
   .board-book-page {
@@ -94,6 +94,16 @@
   
   .board-book-page-mobile {
     background-image: radial-gradient(circle at center, rgba(0,0,0,0.01) 0%, rgba(0,0,0,0) 100%);
+  }
+  
+  /* Text highlighting for accessibility */
+  .prose p {
+    transition: background-color 0.3s ease;
+  }
+  
+  .prose p:hover {
+    background-color: rgba(255, 239, 214, 0.3);
+    border-radius: 0.5rem;
   }
 }
 
