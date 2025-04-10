@@ -1,10 +1,10 @@
-
 import React, { useState } from 'react';
 import { Book, Maximize2, Minimize2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { cn } from '@/lib/utils';
 import NavigationControls from './NavigationControls';
 import BookContent from './BookContent';
+import MobilePageCards from './MobilePageCards';
 
 interface BookContainerProps {
   childName: string;
