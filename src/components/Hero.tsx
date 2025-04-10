@@ -39,11 +39,15 @@ const Hero = () => {
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-r from-legend-pink/20 to-legend-blue/20 rounded-3xl transform rotate-1"></div>
               <div className="relative bg-white p-8 rounded-3xl shadow-xl border border-gray-100">
-                {/* Featured image - replaced with the uploaded illustration */}
+                {/* Changed to use an image that works in both development and production */}
                 <img
-                  src="/lovable-uploads/390b8016-b246-4925-8265-8571a9a2969a.png"
+                  src={import.meta.env.BASE_URL + "lovable-uploads/390b8016-b246-4925-8265-8571a9a2969a.png"}
                   alt="Two children reading a magical storybook together"
                   className="rounded-2xl w-full max-w-2xl mx-auto object-contain aspect-square mb-6"
+                  onError={(e) => {
+                    console.error("Image failed to load");
+                    e.currentTarget.src = "/placeholder.svg";
+                  }}
                 />
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
                   <div className="space-y-2">
