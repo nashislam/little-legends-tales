@@ -16,13 +16,24 @@ serve(async (req) => {
   }
 
   try {
+    console.log('Received request to generate-story function');
     const { childName, childAge, favoriteAnimal, magicalPower, characters, artStyle } = await req.json();
 
     // Validate required parameters
     if (!childName || !childAge || !favoriteAnimal) {
+      console.error('Missing required parameters');
       return new Response(
         JSON.stringify({ error: 'Missing required parameters' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Validate OpenAI API key
+    if (!openAIApiKey) {
+      console.error('Missing OpenAI API key');
+      return new Response(
+        JSON.stringify({ error: 'Server configuration error: Missing API key' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
@@ -40,15 +51,18 @@ serve(async (req) => {
     Structure the story with a beginning (introduction of ${childName} and their magical power), 
     a middle (a challenge or adventure they face), and an end (how they overcome the challenge using their power).
     Make the story heartwarming and magical.
+    Consider the art style "${artStyle}" when crafting the imagery described in the story.
     `;
 
-    // Call OpenAI API to generate the story
+    console.log('Calling OpenAI API with prompt');
+    
+    // Call OpenAI API to generate the story (using GPT-4o for better story generation)
     const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "gpt-4o-mini", // Using GPT-4o-mini as it's a good balance of quality and speed
       messages: [
         {
           role: "system",
-          content: "You are a child-friendly storyteller who creates magical, engaging stories for children. Your stories should be wholesome, positive, and appropriate for the age group specified."
+          content: "You are a child-friendly storyteller who creates magical, engaging stories for children. Your stories should be wholesome, positive, and appropriate for the age group specified. Structure your stories clearly with paragraphs for easy reading."
         },
         {
           role: "user",
@@ -60,6 +74,7 @@ serve(async (req) => {
     });
 
     const story = response.choices[0].message.content;
+    console.log('Successfully generated story');
 
     return new Response(
       JSON.stringify({ story }),
@@ -68,7 +83,7 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error generating story:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: error.message || 'An unknown error occurred' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }

@@ -1,5 +1,6 @@
 
 import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 type StoryParams = {
   childName: string;
@@ -25,9 +26,11 @@ export const generateStory = async (params: StoryParams): Promise<string> => {
     }
 
     if (!data?.story) {
+      console.error('No story data returned:', data);
       throw new Error('No story generated. Please try again.');
     }
 
+    console.log('Story successfully generated');
     return data.story;
   } catch (error) {
     console.error('Error in generateStory function:', error);
