@@ -80,10 +80,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const domain = window.location.origin;
     console.log("Redirecting OAuth to:", `${domain}/auth`);
     
+    // If we're in production and using littlelegends.app domain, force HTTPS
+    let redirectUrl = `${domain}/auth`;
+    if (domain.includes('littlelegends.app') && !domain.startsWith('https')) {
+      // Replace http with https for production domain
+      redirectUrl = redirectUrl.replace('http:', 'https:');
+      console.log("Forcing HTTPS for production redirect:", redirectUrl);
+    }
+    
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${domain}/auth`,
+        redirectTo: redirectUrl,
         skipBrowserRedirect: false,
       }
     });

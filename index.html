@@ -10,6 +10,13 @@
 
     <link rel="icon" href="/public/lovable-uploads/59ecd956-9306-46b8-b826-e0a4f0a48c1f.png" type="image/png">
 
+    <!-- Force HTTPS on production domain -->
+    <script>
+      if (window.location.hostname === "littlelegends.app" && window.location.protocol === "http:") {
+        window.location.href = window.location.href.replace("http:", "https:");
+      }
+    </script>
+
     <meta property="og:title" content="Little Legends - Personalized Children's Stories" />
     <meta property="og:description" content="Create personalized storybooks for your children using AI" />
     <meta property="og:type" content="website" />
