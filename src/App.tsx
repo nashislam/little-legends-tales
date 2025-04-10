@@ -9,6 +9,7 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import CreateStory from "./pages/CreateStory";
 import StoryPreview from "./pages/StoryPreview";
+import MySavedStories from "./pages/MySavedStories";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
@@ -27,6 +28,14 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/create" element={<CreateStory />} />
             <Route path="/preview" element={<StoryPreview />} />
+            <Route 
+              path="/my-stories" 
+              element={
+                <ProtectedRoute>
+                  <MySavedStories />
+                </ProtectedRoute>
+              } 
+            />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
