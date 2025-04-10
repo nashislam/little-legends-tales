@@ -1,7 +1,7 @@
 
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { BookOpen, LogOut, User, Book } from "lucide-react";
+import { BookOpen, LogOut, User, Book, BookMarked } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -61,8 +61,8 @@ const Navbar = () => {
                   asChild
                 >
                   <Link to="/my-stories">
-                    <Book className="h-4 w-4" />
-                    <span>My Stories</span>
+                    <BookMarked className="h-4 w-4" />
+                    <span>My Saved Stories</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
@@ -106,8 +106,8 @@ const Navbar = () => {
                   className="flex items-center gap-2"
                 >
                   <Link to="/my-stories">
-                    <Book className="h-4 w-4" />
-                    <span>My Stories</span>
+                    <BookMarked className="h-4 w-4" />
+                    <span>My Saved Stories</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
