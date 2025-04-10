@@ -43,20 +43,76 @@ export const splitStoryIntoPages = (story: string, paragraphsPerPage: number = 2
 };
 
 /**
- * Extracts a scene description from page content for image generation
- * @param content - The page content
- * @returns A concise scene description for image generation
+ * Extracts key story elements from the full story text
+ * @param story - The full story text
+ * @returns Object containing key elements (main character, animals, locations)
  */
-const extractSceneDescription = (content: string): string => {
-  // Handle title page differently
-  if (content === "Title Page") {
-    return "A magical children's storybook cover with sparkles and adventure theme, whimsical, fantasy style";
+export const extractStoryElements = (story: string): {
+  mainCharacter?: string;
+  animals?: string[];
+  locations?: string[];
+} => {
+  const elements: {
+    mainCharacter?: string;
+    animals?: string[];
+    locations?: string[];
+  } = {
+    animals: [],
+    locations: []
+  };
+  
+  // Try to extract the main character (usually mentioned early in the story)
+  const nameMatch = story.match(/([A-Z][a-z]+)(?:\s+was|\s+had|\s+felt|\s+saw|\s+looked|\s+went)/);
+  if (nameMatch && nameMatch[1]) {
+    elements.mainCharacter = nameMatch[1];
   }
   
-  // Extract the first 100-150 characters as a base
-  let description = content.substring(0, 150);
+  // Extract animal mentions
+  const animalMatches = story.match(/(?:a|the)\s+([a-z]+\s+[a-z]+|[a-z]+)(?:\s+with|\s+that|\s+who|\s+which)/ig);
+  if (animalMatches) {
+    const animalCandidates = animalMatches.map(m => 
+      m.replace(/^(?:a|the)\s+/, '').replace(/\s+(?:with|that|who|which).*$/, '')
+    );
+    elements.animals = [...new Set(animalCandidates)];
+  }
   
-  // Look for descriptive sentences
+  // Extract location mentions
+  const locationMatches = story.match(/(?:at|in|to)\s+(?:the|a)\s+([a-z]+\s+[a-z]+|[a-z]+)/ig);
+  if (locationMatches) {
+    const locationCandidates = locationMatches.map(m => 
+      m.replace(/^(?:at|in|to)\s+(?:the|a)\s+/, '')
+    );
+    elements.locations = [...new Set(locationCandidates)];
+  }
+  
+  return elements;
+};
+
+/**
+ * Extracts a scene description from page content for image generation
+ * @param content - The page content
+ * @param pageNumber - The page number
+ * @param childName - The child's name
+ * @param favoriteAnimal - The child's favorite animal
+ * @param storyElements - Key elements extracted from the story
+ * @returns A consistent scene description for image generation
+ */
+const extractSceneDescription = (
+  content: string, 
+  pageNumber: number,
+  childName: string,
+  favoriteAnimal: string,
+  storyElements: ReturnType<typeof extractStoryElements>
+): string => {
+  // Handle title page differently
+  if (content === "Title Page") {
+    return `A magical children's storybook cover featuring ${childName}, a ${favoriteAnimal}, and a magical adventure theme. Whimsical, fantasy style, child-friendly illustration with vibrant colors.`;
+  }
+  
+  // Extract the first 150-200 characters as a base for the current scene
+  let description = content.substring(0, 200);
+  
+  // Look for descriptive sentences that indicate a scene
   const descriptivePatterns = [
     /(\w+\s+was\s+\w+ing\s+[^.!?]+[.!?])/i, // "X was doing Y"
     /(\w+\s+saw\s+[^.!?]+[.!?])/i,           // "X saw Y"
@@ -72,12 +128,98 @@ const extractSceneDescription = (content: string): string => {
     }
   }
   
-  // For children's book style, enhance the prompt
-  return description.trim() + ", children's book illustration style, whimsical, vibrant";
+  // Add consistency elements to the prompt
+  let consistentPrompt = `A scene from a children's storybook featuring ${childName}`;
+  
+  // Add the favorite animal for consistency
+  consistentPrompt += `, with ${favoriteAnimal}`;
+  
+  // Add extracted story elements for consistency across pages
+  if (storyElements.mainCharacter) {
+    consistentPrompt += `, and ${storyElements.mainCharacter}`;
+  }
+  
+  // Combine with the specific scene description
+  const finalPrompt = `${consistentPrompt}. Scene: ${description.trim()}. Children's book illustration style, consistent character design across all images, same art style throughout the book.`;
+  
+  return finalPrompt;
 };
 
 /**
- * Generates an AI image for a story page
+ * Generates AI images for all story pages with consistent characters and scenes
+ * @param pages - Array of page content
+ * @param childName - The child's name
+ * @param favoriteAnimal - The child's favorite animal
+ * @param artStyle - The selected art style
+ * @param fullStory - The complete story text
+ * @returns Promise with updated pages containing image URLs
+ */
+export const generateConsistentStoryImages = async (
+  pages: Page[], 
+  childName: string,
+  favoriteAnimal: string,
+  artStyle: string,
+  fullStory: string
+): Promise<Page[]> => {
+  // Extract key story elements for consistency
+  const storyElements = extractStoryElements(fullStory);
+  console.log('Extracted story elements for consistent imagery:', storyElements);
+  
+  // Create the character description for consistency
+  const characterDescription = `${childName} (the main character) and ${favoriteAnimal} maintaining the same appearance throughout all illustrations.`;
+  
+  // Process pages sequentially to maintain consistency
+  const updatedPages = [...pages];
+  
+  for (let i = 0; i < updatedPages.length; i++) {
+    try {
+      const sceneDescription = extractSceneDescription(
+        updatedPages[i].content,
+        i,
+        childName,
+        favoriteAnimal,
+        storyElements
+      );
+      
+      console.log(`Generating consistent image for page ${i+1} with description: ${sceneDescription}`);
+      
+      // Create a prompt that maintains consistency
+      const consistentPrompt = `${sceneDescription} ${characterDescription} Art style: ${artStyle}. Consistent character design across all illustrations.`;
+      
+      // Call our Supabase Edge Function with the enhanced prompt
+      const { data, error } = await supabase.functions.invoke('generate-image', {
+        body: {
+          prompt: consistentPrompt,
+          artStyle: artStyle,
+          pageNumber: i,
+          previousPages: i > 0 ? updatedPages.slice(0, i).map(p => p.content) : [],
+        },
+      });
+
+      if (error) {
+        console.error('Error calling generate-image function:', error);
+        throw new Error(`Failed to generate image: ${error.message}`);
+      }
+
+      if (!data?.imageUrl) {
+        console.error('No image URL returned from function:', data);
+        throw new Error('No image URL returned from generation service');
+      }
+
+      console.log('Image generation response for page', i+1, ':', data);
+      updatedPages[i].image = data.imageUrl;
+    } catch (error) {
+      console.error(`Error generating image for page ${i}:`, error);
+      updatedPages[i].imageError = true;
+      updatedPages[i].image = generatePlaceholderImage(i, artStyle);
+    }
+  }
+  
+  return updatedPages;
+};
+
+/**
+ * Generates a single AI image for a story page
  * @param pageContent - The content of the page
  * @param pageNumber - The page number
  * @param artStyle - The selected art style
@@ -86,7 +228,7 @@ const extractSceneDescription = (content: string): string => {
 export const generateStoryImage = async (pageContent: string, pageNumber: number, artStyle: string): Promise<string> => {
   try {
     // Extract a scene description from the page content
-    const sceneDescription = extractSceneDescription(pageContent);
+    const sceneDescription = extractSceneDescription(pageContent, pageNumber, "Child", "magical animal", {});
     console.log(`Generating image for page ${pageNumber} with description: ${sceneDescription}`);
     
     // Call our Supabase Edge Function
@@ -136,3 +278,4 @@ export const generatePlaceholderImage = (pageNumber: number, artStyle: string): 
   // Return placeholder image - in production this would be AI-generated
   return `${import.meta.env.BASE_URL}placeholder.svg`;
 };
+

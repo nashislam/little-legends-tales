@@ -122,6 +122,7 @@ const StoryPreview = () => {
               childName={formData?.childName || "Child"} 
               pages={storyPages} 
               artStyle={formData?.artStyle || "watercolor"} 
+              storyText={story} // Pass the full story for consistency analysis
             />
           )}
           
@@ -159,4 +160,3 @@ const StoryPreview = () => {
 };
 
 export default StoryPreview;
-

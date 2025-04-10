@@ -16,7 +16,7 @@ serve(async (req) => {
   }
 
   try {
-    const { prompt, artStyle } = await req.json();
+    const { prompt, artStyle, pageNumber = 0, previousPages = [] } = await req.json();
     
     if (!prompt) {
       return new Response(
@@ -41,34 +41,45 @@ serve(async (req) => {
     }
 
     console.log('Generating image with prompt:', prompt);
+    console.log('Page number:', pageNumber);
+    console.log('Previous pages context count:', previousPages.length);
+    
+    // Build a consistency-focused prompt
+    let enhancedPrompt = prompt;
+    
+    // Add context about page sequence
+    if (pageNumber === 0) {
+      enhancedPrompt = `Title page illustration: ${enhancedPrompt}`;
+    } else {
+      enhancedPrompt = `Page ${pageNumber + 1} illustration: ${enhancedPrompt}`;
+    }
     
     // Enhance the prompt based on art style
-    let enhancedPrompt = `A child-friendly illustration in ${artStyle || 'watercolor'} style: ${prompt}`;
-    
-    // Style-specific prompt enhancements
     switch (artStyle) {
       case 'watercolor':
-        enhancedPrompt += ". Soft, dreamy watercolor illustration, gentle colors, suitable for children's book.";
+        enhancedPrompt += " Soft, dreamy watercolor illustration, gentle colors, suitable for children's book. Consistent character design throughout the story.";
         break;
       case 'cartoon':
-        enhancedPrompt += ". Bright, playful cartoon illustration with bold outlines, vibrant colors, child-friendly.";
+        enhancedPrompt += " Bright, playful cartoon illustration with bold outlines, vibrant colors, child-friendly. Consistent character design throughout the story.";
         break;
       case 'dreamy':
-        enhancedPrompt += ". Ethereal, magical illustration with soft focus, glowing elements, and dreamy atmosphere.";
+        enhancedPrompt += " Ethereal, magical illustration with soft focus, glowing elements, and dreamy atmosphere. Consistent character design throughout the story.";
         break;
       case 'pixel':
-        enhancedPrompt += ". Cute pixel art illustration, 16-bit style, nostalgic game-like appearance.";
+        enhancedPrompt += " Cute pixel art illustration, 16-bit style, nostalgic game-like appearance. Consistent character design throughout the story.";
         break;
       case 'comic':
-        enhancedPrompt += ". Comic book style illustration with panels, speech bubbles, and action lines.";
+        enhancedPrompt += " Comic book style illustration with panels, speech bubbles, and action lines. Consistent character design throughout the story.";
         break;
       case 'storybook':
-        enhancedPrompt += ". Classic storybook illustration, detailed, warm colors, fairy tale quality.";
+        enhancedPrompt += " Classic storybook illustration, detailed, warm colors, fairy tale quality. Consistent character design throughout the story.";
         break;
+      default:
+        enhancedPrompt += " Children's book illustration with consistent character design throughout the story.";
     }
     
     try {
-      // Call OpenAI API to generate the image
+      // Call OpenAI API to generate the image with enhanced consistency
       const response = await fetch('https://api.openai.com/v1/images/generations', {
         method: 'POST',
         headers: {
@@ -76,11 +87,13 @@ serve(async (req) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: "dall-e-2", // Using DALL-E 2 for faster and more cost-effective generations
+          model: "dall-e-3", // Using DALL-E 3 for better consistency
           prompt: enhancedPrompt,
           n: 1,
-          size: "512x512", // Smaller size for faster generation and lower cost
+          size: "1024x1024", // Higher quality for better consistency
           response_format: "url",
+          quality: "standard", // Adjust based on budget constraints
+          style: "vivid", // Helps maintain consistent color palettes
         }),
       });
 
@@ -122,3 +135,4 @@ serve(async (req) => {
     );
   }
 });
+

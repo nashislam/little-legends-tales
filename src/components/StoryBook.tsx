@@ -1,6 +1,5 @@
-
 import React, { useState, useEffect } from 'react';
-import { generateStoryImage } from "@/lib/storyUtils";
+import { generateStoryImage, generateConsistentStoryImages } from "@/lib/storyUtils";
 import { cn } from "@/lib/utils";
 import NavigationControls from './storybook/NavigationControls';
 import Page from './storybook/Page';
@@ -18,9 +17,10 @@ interface StoryBookProps {
   childName: string;
   pages: Page[];
   artStyle: string;
+  storyText?: string; // Full story text for consistency analysis
 }
 
-const StoryBook = ({ childName, pages, artStyle }: StoryBookProps) => {
+const StoryBook = ({ childName, pages, artStyle, storyText = "" }: StoryBookProps) => {
   const [currentPage, setCurrentPage] = useState(0);
   const [loadedPages, setLoadedPages] = useState<Page[]>([]);
   const [loading, setLoading] = useState<boolean[]>([]);
@@ -34,41 +34,34 @@ const StoryBook = ({ childName, pages, artStyle }: StoryBookProps) => {
     // Copy the pages initially
     setLoadedPages([...pages]);
     
-    // Generate images for all pages asynchronously
+    // Generate consistent images for all pages
     const generateAllImages = async () => {
-      const updatedPages = [...pages];
-      const newLoadingStates = [...initialLoading];
+      // Set loading state
+      setLoading(Array(pages.length).fill(true));
       
-      // Process pages one by one to avoid overwhelming the API
-      for (let i = 0; i < updatedPages.length; i++) {
-        try {
-          // Only generate if there's no image already
-          if (!updatedPages[i].image) {
-            const imageUrl = await generateStoryImage(updatedPages[i].content, i, artStyle);
-            updatedPages[i] = { 
-              ...updatedPages[i], 
-              image: imageUrl,
-              imageError: imageUrl.includes('placeholder')  // Mark as error if returning placeholder
-            };
-          }
-        } catch (error) {
-          console.error(`Error generating image for page ${i}:`, error);
-          updatedPages[i] = { 
-            ...updatedPages[i], 
-            imageError: true,
-            image: `${import.meta.env.BASE_URL}placeholder.svg` 
-          };
-        }
+      try {
+        // Generate consistent images across all pages
+        const favoriteAnimal = "magical creature"; // Default, could be passed as prop
+        const updatedPages = await generateConsistentStoryImages(
+          pages, 
+          childName, 
+          favoriteAnimal,
+          artStyle,
+          storyText
+        );
         
-        // Mark this page as loaded regardless of success/failure
-        newLoadingStates[i] = false;
-        setLoading([...newLoadingStates]);
-        setLoadedPages([...updatedPages]);
+        // Update with completed pages
+        setLoadedPages(updatedPages);
+      } catch (error) {
+        console.error('Error generating consistent images:', error);
+      } finally {
+        // Mark all pages as loaded regardless of success/failure
+        setLoading(Array(pages.length).fill(false));
       }
     };
     
     generateAllImages();
-  }, [pages, artStyle]);
+  }, [pages, childName, artStyle, storyText]);
 
   const nextPage = () => {
     if (currentPage < totalPages - 1) {
