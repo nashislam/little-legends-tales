@@ -39,10 +39,11 @@ const Hero = () => {
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-r from-legend-pink/20 to-legend-blue/20 rounded-3xl transform rotate-1"></div>
               <div className="relative bg-white p-8 rounded-3xl shadow-xl border border-gray-100">
+                {/* Featured image - replaced with the uploaded illustration */}
                 <img
-                  src="https://static.vecteezy.com/system/resources/previews/007/559/678/original/cute-kids-reading-book-together-children-book-day-illustration-suitable-for-greeting-card-invitation-poster-cut-sticker-free-vector.jpg"
-                  alt="Children enjoying a storybook"
-                  className="rounded-2xl w-full object-cover aspect-[16/9] mb-6"
+                  src="/lovable-uploads/390b8016-b246-4925-8265-8571a9a2969a.png"
+                  alt="Two children reading a magical storybook together"
+                  className="rounded-2xl w-full max-w-2xl mx-auto object-contain aspect-square mb-6"
                 />
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
                   <div className="space-y-2">
