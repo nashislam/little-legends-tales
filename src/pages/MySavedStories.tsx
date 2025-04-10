@@ -34,14 +34,15 @@ const MySavedStories = () => {
     const fetchStories = async () => {
       try {
         const { data, error } = await supabase
-          .from('stories' as any)
+          .from('stories')
           .select('*')
           .eq('user_id', user.id)
           .order('created_at', { ascending: false });
 
         if (error) throw error;
 
-        setStories(data || []);
+        // Explicitly type the data as Story[] to avoid type inference issues
+        setStories(data as Story[] || []);
       } catch (error) {
         console.error('Error fetching stories:', error);
         toast({
