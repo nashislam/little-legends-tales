@@ -20,7 +20,10 @@ serve(async (req) => {
     
     if (!prompt) {
       return new Response(
-        JSON.stringify({ error: "Missing required parameter: prompt" }),
+        JSON.stringify({ 
+          error: "Missing required parameter: prompt",
+          imageUrl: `${import.meta.env.BASE_URL || '/'}placeholder.svg` 
+        }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -29,7 +32,10 @@ serve(async (req) => {
     if (!openAIApiKey) {
       console.log('No OpenAI API key found, returning placeholder image URL');
       return new Response(
-        JSON.stringify({ imageUrl: `/placeholder.svg` }),
+        JSON.stringify({ 
+          imageUrl: `${import.meta.env.BASE_URL || '/'}placeholder.svg`,
+          error: "OpenAI API key not configured"
+        }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -78,12 +84,13 @@ serve(async (req) => {
         }),
       });
 
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error?.message || `OpenAI API returned status ${response.status}`);
+      }
+
       const data = await response.json();
       console.log('Image generation response:', data);
-
-      if (data.error) {
-        throw new Error(data.error.message || "OpenAI API error");
-      }
 
       if (!data.data || data.data.length === 0) {
         throw new Error("No image generated");
@@ -94,12 +101,12 @@ serve(async (req) => {
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     } catch (openaiError) {
-      // If OpenAI API fails, return a placeholder
+      // If OpenAI API fails, return a placeholder and error details
       console.error('OpenAI API error:', openaiError);
       return new Response(
         JSON.stringify({ 
-          imageUrl: `/placeholder.svg`,
-          error: "Image generation failed, using placeholder"
+          imageUrl: `${import.meta.env.BASE_URL || '/'}placeholder.svg`,
+          error: `Image generation failed: ${openaiError.message || "Unknown error"}`
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
@@ -109,7 +116,7 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({ 
         error: error.message || 'An unknown error occurred',
-        imageUrl: `/placeholder.svg` 
+        imageUrl: `${import.meta.env.BASE_URL || '/'}placeholder.svg` 
       }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );

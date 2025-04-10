@@ -1,13 +1,15 @@
 
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Loader2, AlertTriangle } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { generateStoryImage } from "@/lib/storyUtils";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface Page {
   content: string;
   image?: string;
+  imageError?: boolean;
 }
 
 interface StoryBookProps {
@@ -40,10 +42,19 @@ const StoryBook = ({ childName, pages, artStyle }: StoryBookProps) => {
           // Only generate if there's no image already
           if (!updatedPages[i].image) {
             const imageUrl = await generateStoryImage(updatedPages[i].content, i, artStyle);
-            updatedPages[i] = { ...updatedPages[i], image: imageUrl };
+            updatedPages[i] = { 
+              ...updatedPages[i], 
+              image: imageUrl,
+              imageError: imageUrl.includes('placeholder')  // Mark as error if returning placeholder
+            };
           }
         } catch (error) {
           console.error(`Error generating image for page ${i}:`, error);
+          updatedPages[i] = { 
+            ...updatedPages[i], 
+            imageError: true,
+            image: `${import.meta.env.BASE_URL}placeholder.svg` 
+          };
         }
         
         // Mark this page as loaded regardless of success/failure
@@ -66,6 +77,37 @@ const StoryBook = ({ childName, pages, artStyle }: StoryBookProps) => {
     if (currentPage > 0) {
       setCurrentPage(currentPage - 1);
     }
+  };
+
+  const retryImageGeneration = async (pageIndex: number) => {
+    // Mark the page as loading
+    const newLoadingStates = [...loading];
+    newLoadingStates[pageIndex] = true;
+    setLoading(newLoadingStates);
+    
+    try {
+      const imageUrl = await generateStoryImage(loadedPages[pageIndex].content, pageIndex, artStyle);
+      const updatedPages = [...loadedPages];
+      updatedPages[pageIndex] = { 
+        ...updatedPages[pageIndex], 
+        image: imageUrl,
+        imageError: imageUrl.includes('placeholder') 
+      };
+      setLoadedPages(updatedPages);
+    } catch (error) {
+      console.error(`Error retrying image generation for page ${pageIndex}:`, error);
+      const updatedPages = [...loadedPages];
+      updatedPages[pageIndex] = { 
+        ...updatedPages[pageIndex], 
+        imageError: true,
+        image: `${import.meta.env.BASE_URL}placeholder.svg`
+      };
+      setLoadedPages(updatedPages);
+    }
+    
+    // Mark as no longer loading
+    newLoadingStates[pageIndex] = false;
+    setLoading(newLoadingStates);
   };
 
   return (
@@ -95,11 +137,34 @@ const StoryBook = ({ childName, pages, artStyle }: StoryBookProps) => {
           </div>
           
           {/* Page illustration */}
-          <div className="flex-1 bg-gray-100 flex items-center justify-center p-4">
+          <div className="flex-1 bg-gray-100 flex items-center justify-center p-4 relative">
             {loading[currentPage] ? (
               <div className="flex flex-col items-center justify-center text-gray-400">
                 <Loader2 className="h-12 w-12 animate-spin mb-2" />
                 <p>Generating illustration...</p>
+              </div>
+            ) : loadedPages[currentPage]?.imageError ? (
+              <div className="flex flex-col items-center justify-center w-full">
+                <Alert variant="destructive" className="mb-4 mx-4">
+                  <AlertTriangle className="h-4 w-4 mr-2" />
+                  <AlertDescription>
+                    Image generation failed
+                  </AlertDescription>
+                </Alert>
+                
+                <img 
+                  src={loadedPages[currentPage].image} 
+                  alt="Placeholder illustration" 
+                  className="max-h-[60%] max-w-[60%] object-contain opacity-50"
+                />
+                
+                <Button 
+                  onClick={() => retryImageGeneration(currentPage)} 
+                  className="mt-4"
+                  variant="outline"
+                >
+                  Retry Image Generation
+                </Button>
               </div>
             ) : loadedPages[currentPage]?.image ? (
               <img 
@@ -110,7 +175,13 @@ const StoryBook = ({ childName, pages, artStyle }: StoryBookProps) => {
                   console.error("Image failed to load");
                   const target = e.target as HTMLImageElement;
                   target.src = `${import.meta.env.BASE_URL}placeholder.svg`;
-                  target.classList.add("border", "border-red-200");
+                  const updatedPages = [...loadedPages];
+                  updatedPages[currentPage] = { 
+                    ...updatedPages[currentPage], 
+                    imageError: true,
+                    image: `${import.meta.env.BASE_URL}placeholder.svg`
+                  };
+                  setLoadedPages(updatedPages);
                 }}
               />
             ) : (
@@ -164,6 +235,23 @@ const StoryBook = ({ childName, pages, artStyle }: StoryBookProps) => {
                 <Loader2 className="h-8 w-8 animate-spin mb-2" />
                 <p>Generating illustration...</p>
               </div>
+            ) : page.imageError ? (
+              <div className="flex flex-col items-center justify-center py-4">
+                <Alert variant="destructive" className="mb-3 w-full">
+                  <AlertTriangle className="h-4 w-4 mr-2" />
+                  <AlertDescription>
+                    Image generation failed
+                  </AlertDescription>
+                </Alert>
+                <Button 
+                  onClick={() => retryImageGeneration(index)} 
+                  variant="outline" 
+                  size="sm"
+                  className="mt-2"
+                >
+                  Retry
+                </Button>
+              </div>
             ) : page.image && (
               <img 
                 src={page.image} 
@@ -172,6 +260,14 @@ const StoryBook = ({ childName, pages, artStyle }: StoryBookProps) => {
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
                   target.src = `${import.meta.env.BASE_URL}placeholder.svg`;
+                  
+                  const updatedPages = [...loadedPages];
+                  updatedPages[index] = { 
+                    ...updatedPages[index], 
+                    imageError: true,
+                    image: `${import.meta.env.BASE_URL}placeholder.svg`
+                  };
+                  setLoadedPages(updatedPages);
                 }}
               />
             )}

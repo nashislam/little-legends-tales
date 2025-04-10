@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 interface Page {
   content: string;
   image?: string;
+  imageError?: boolean;
 }
 
 /**
@@ -87,13 +88,16 @@ export const generateStoryImage = async (pageContent: string, pageNumber: number
 
     if (error) {
       console.error('Error calling generate-image function:', error);
-      return generatePlaceholderImage(pageNumber, artStyle);
+      throw new Error(`Failed to generate image: ${error.message}`);
+    }
+
+    if (!data?.imageUrl) {
+      console.error('No image URL returned from function:', data);
+      throw new Error('No image URL returned from generation service');
     }
 
     console.log('Image generation response:', data);
-    
-    // Return the generated image URL or a placeholder if something went wrong
-    return data?.imageUrl || generatePlaceholderImage(pageNumber, artStyle);
+    return data.imageUrl;
   } catch (error) {
     console.error('Error in generateStoryImage:', error);
     return generatePlaceholderImage(pageNumber, artStyle);
