@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -7,7 +6,7 @@ import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import StoryBook from "@/components/StoryBook";
-import { splitStoryIntoPages, generatePlaceholderImage } from "@/lib/storyUtils";
+import { splitStoryIntoPages } from "@/lib/storyUtils";
 import { Download } from "lucide-react";
 
 const StoryPreview = () => {
@@ -22,25 +21,15 @@ const StoryPreview = () => {
   const [storyPages, setStoryPages] = useState<any[]>([]);
 
   useEffect(() => {
-    // Check if we have story data in location state
     if (location.state?.story) {
       const storyText = location.state.story;
       setStory(storyText);
       setFormData(location.state.formData);
       
-      // Process the story into pages
       const pages = splitStoryIntoPages(storyText);
       
-      // Add placeholder images to each page
-      // In a production app, this would be replaced with AI-generated images
-      const pagesWithImages = pages.map((page, index) => ({
-        ...page,
-        image: generatePlaceholderImage(index, location.state.formData?.artStyle || 'watercolor')
-      }));
-      
-      setStoryPages(pagesWithImages);
+      setStoryPages(pages);
     } else {
-      // If no story data, redirect to create page
       navigate("/create");
     }
   }, [location.state, navigate]);
@@ -60,7 +49,6 @@ const StoryPreview = () => {
 
     setSaving(true);
     try {
-      // Specifically cast the from() method to handle TypeScript error
       const { error } = await supabase
         .from('stories' as any)
         .insert({
@@ -95,17 +83,14 @@ const StoryPreview = () => {
   const downloadAsPdf = () => {
     setDownloading(true);
     
-    // Simulate PDF generation delay
     setTimeout(() => {
       setDownloading(false);
       
-      // In a real implementation, this would generate and download an actual PDF
       toast({
         title: "PDF Downloaded",
         description: "Your story has been downloaded as a PDF.",
       });
       
-      // For now, create a text file as a placeholder
       const element = document.createElement('a');
       const file = new Blob([`${formData?.childName || "Child"}'s Adventure\n\n${story}`], {type: 'text/plain'});
       element.href = URL.createObjectURL(file);
