@@ -32,10 +32,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, newSession) => {
+        console.log('Auth state changed:', event);
         setSession(newSession);
         setUser(newSession?.user ?? null);
 
-        // Important: Don't call any other Supabase methods directly here
+        // Don't call Supabase methods directly in the callback
+        // Use setTimeout to avoid potential deadlocks
         if (event === 'SIGNED_IN') {
           setTimeout(() => navigate('/'), 0);
         } else if (event === 'SIGNED_OUT') {
@@ -49,6 +51,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setSession(currentSession);
       setUser(currentSession?.user ?? null);
       setLoading(false);
+      
+      if (currentSession?.user) {
+        console.log('User is already signed in:', currentSession.user.email);
+      }
     });
 
     return () => {
@@ -69,12 +75,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signInWithGoogle = async () => {
-    await supabase.auth.signInWithOAuth({
+    const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
         redirectTo: window.location.origin,
       }
     });
+    
+    if (error) {
+      console.error('Google sign in error:', error);
+      throw error;
+    }
   };
 
   const value = {
