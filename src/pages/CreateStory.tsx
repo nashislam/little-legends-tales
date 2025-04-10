@@ -5,6 +5,11 @@ import StoryForm from "@/components/StoryForm";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 
+// Define a simple type for the preferences check
+type PreferenceCheck = {
+  id: string;
+};
+
 const CreateStory = () => {
   const { user } = useAuth();
   const [hasPreferences, setHasPreferences] = useState(false);
@@ -23,6 +28,7 @@ const CreateStory = () => {
           .single();
           
         if (data) {
+          // We know data has an id property if it exists
           setHasPreferences(true);
         }
       } catch (error) {

@@ -44,6 +44,20 @@ const initialFormData: FormData = {
   artStyle: 'watercolor',
 };
 
+// Define UserPreference type to match the database structure
+type UserPreference = {
+  id: string;
+  user_id: string;
+  child_name: string | null;
+  child_age: string | null;
+  favorite_animal: string | null;
+  preferred_magical_power: string | null;
+  favorite_characters: string | null;
+  preferred_art_style: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 const StoryForm = () => {
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [isLoading, setIsLoading] = useState(false);
@@ -74,13 +88,15 @@ const StoryForm = () => {
         }
         
         if (data) {
+          // Cast data to our UserPreference type to safely access properties
+          const preferences = data as UserPreference;
           setFormData({
-            childName: data.child_name || '',
-            childAge: data.child_age || '',
-            favoriteAnimal: data.favorite_animal || '',
-            magicalPower: data.preferred_magical_power || '',
-            characters: data.favorite_characters || '',
-            artStyle: data.preferred_art_style || 'watercolor',
+            childName: preferences.child_name || '',
+            childAge: preferences.child_age || '',
+            favoriteAnimal: preferences.favorite_animal || '',
+            magicalPower: preferences.preferred_magical_power || '',
+            characters: preferences.favorite_characters || '',
+            artStyle: preferences.preferred_art_style || 'watercolor',
           });
           setSavePreferences(true);
         }
@@ -128,11 +144,13 @@ const StoryForm = () => {
       
       let error;
       if (data) {
+        // Cast data to access id property safely
+        const existingPref = data as { id: string };
         // Update existing preferences using type assertion
         const { error: updateError } = await supabase
           .from('user_preferences' as any)
           .update(preferences)
-          .eq('id', data.id);
+          .eq('id', existingPref.id);
         error = updateError;
       } else {
         // Insert new preferences using type assertion
