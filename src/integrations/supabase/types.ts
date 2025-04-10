@@ -33,6 +33,45 @@ export type Database = {
         }
         Relationships: []
       }
+      stories: {
+        Row: {
+          art_style: string | null
+          characters: string | null
+          child_age: string | null
+          child_name: string | null
+          content: string
+          created_at: string
+          favorite_animal: string | null
+          id: string
+          magical_power: string | null
+          user_id: string | null
+        }
+        Insert: {
+          art_style?: string | null
+          characters?: string | null
+          child_age?: string | null
+          child_name?: string | null
+          content: string
+          created_at?: string
+          favorite_animal?: string | null
+          id?: string
+          magical_power?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          art_style?: string | null
+          characters?: string | null
+          child_age?: string | null
+          child_name?: string | null
+          content?: string
+          created_at?: string
+          favorite_animal?: string | null
+          id?: string
+          magical_power?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
