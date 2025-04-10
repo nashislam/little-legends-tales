@@ -74,7 +74,7 @@ const MySavedStories = () => {
   const handleDeleteStory = async (id: string) => {
     try {
       const { error } = await supabase
-        .from('stories' as any)
+        .from('stories')
         .delete()
         .eq('id', id);
 

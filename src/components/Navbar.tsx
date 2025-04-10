@@ -1,7 +1,7 @@
 
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { BookOpen, LogOut, User } from "lucide-react";
+import { BookOpen, LogOut, User, Book } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -57,6 +57,16 @@ const Navbar = () => {
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem 
+                  className="flex items-center gap-2" 
+                  asChild
+                >
+                  <Link to="/my-stories">
+                    <Book className="h-4 w-4" />
+                    <span>My Stories</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem 
                   className="flex items-center gap-2 text-red-600" 
                   onClick={() => signOut()}
                 >
@@ -91,6 +101,16 @@ const Navbar = () => {
                 </Avatar>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
+                <DropdownMenuItem 
+                  asChild
+                  className="flex items-center gap-2"
+                >
+                  <Link to="/my-stories">
+                    <Book className="h-4 w-4" />
+                    <span>My Stories</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem 
                   className="flex items-center gap-2 text-red-600" 
                   onClick={() => signOut()}
