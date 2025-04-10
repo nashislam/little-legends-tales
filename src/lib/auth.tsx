@@ -75,11 +75,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signInWithGoogle = async () => {
-    // Use absolute URL for redirectTo to ensure proper callback handling
+    // Get the current domain and use it for the redirect
+    // This will adapt to both HTTP and HTTPS automatically
+    const domain = window.location.origin;
+    console.log("Redirecting OAuth to:", `${domain}/auth`);
+    
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: 'https://littlelegends.app/auth',
+        redirectTo: `${domain}/auth`,
         skipBrowserRedirect: false,
       }
     });
