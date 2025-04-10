@@ -87,8 +87,8 @@ const StoryForm = () => {
     } catch (error) {
       console.error('Error generating story:', error);
       toast({
-        title: "Something went wrong",
-        description: "We couldn't generate your story. Please try again.",
+        title: "Story Generation Failed",
+        description: error instanceof Error ? error.message : "We couldn't generate your story. Please try again.",
         variant: "destructive"
       });
     } finally {
