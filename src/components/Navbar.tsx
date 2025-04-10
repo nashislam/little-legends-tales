@@ -9,6 +9,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 
 const Navbar = () => {
@@ -33,6 +34,9 @@ const Navbar = () => {
           <Link to="/how-it-works" className="font-semibold hover:text-legend-blue transition-colors">
             How It Works
           </Link>
+          <Link to="/privacy-policy" className="font-semibold hover:text-legend-blue transition-colors">
+            Privacy Policy
+          </Link>
           
           <Link to="/create">
             <Button className="bg-legend-blue hover:bg-blue-500 text-white rounded-full px-6">
@@ -54,6 +58,7 @@ const Navbar = () => {
                   <User className="h-4 w-4" />
                   <span>{user.email}</span>
                 </DropdownMenuItem>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem 
                   className="flex items-center gap-2 text-red-600" 
                   onClick={() => signOut()}
