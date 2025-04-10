@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -26,8 +27,8 @@ const StoryPreview = () => {
       setStory(storyText);
       setFormData(location.state.formData);
       
+      // Use our updated splitStoryIntoPages function that creates a title page
       const pages = splitStoryIntoPages(storyText);
-      
       setStoryPages(pages);
     } else {
       navigate("/create");
@@ -158,3 +159,4 @@ const StoryPreview = () => {
 };
 
 export default StoryPreview;
+

@@ -14,12 +14,17 @@ interface Page {
  * @returns Array of page objects with content
  */
 export const splitStoryIntoPages = (story: string, paragraphsPerPage: number = 2): Page[] => {
+  // Create title page as the first page
+  const pages: Page[] = [
+    {
+      content: "Title Page",
+    }
+  ];
+  
   // Split the story by paragraphs (empty lines)
   const paragraphs = story.split('\n\n').filter(p => p.trim() !== '');
   
-  // Group paragraphs into pages
-  const pages: Page[] = [];
-  
+  // Group paragraphs into pages, starting from page 2 (after title)
   for (let i = 0; i < paragraphs.length; i += paragraphsPerPage) {
     const pageContent = paragraphs.slice(i, i + paragraphsPerPage).join('\n\n');
     pages.push({
@@ -27,8 +32,8 @@ export const splitStoryIntoPages = (story: string, paragraphsPerPage: number = 2
     });
   }
   
-  // Ensure we have at least one page
-  if (pages.length === 0) {
+  // Ensure we have at least two pages (title + content)
+  if (pages.length === 1) {
     pages.push({
       content: story || "Once upon a time..."
     });
@@ -43,6 +48,11 @@ export const splitStoryIntoPages = (story: string, paragraphsPerPage: number = 2
  * @returns A concise scene description for image generation
  */
 const extractSceneDescription = (content: string): string => {
+  // Handle title page differently
+  if (content === "Title Page") {
+    return "A magical children's storybook cover with sparkles and adventure theme, whimsical, fantasy style";
+  }
+  
   // Extract the first 100-150 characters as a base
   let description = content.substring(0, 150);
   
@@ -62,7 +72,8 @@ const extractSceneDescription = (content: string): string => {
     }
   }
   
-  return description.trim();
+  // For children's book style, enhance the prompt
+  return description.trim() + ", children's book illustration style, whimsical, vibrant";
 };
 
 /**

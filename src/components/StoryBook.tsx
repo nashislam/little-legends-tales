@@ -109,6 +109,21 @@ const StoryBook = ({ childName, pages, artStyle }: StoryBookProps) => {
     newLoadingStates[pageIndex] = false;
     setLoading(newLoadingStates);
   };
+  
+  // Format page content with line breaks and proper spacing
+  const formatPageContent = (content: string) => {
+    if (!content) return null;
+    
+    // Split content by paragraphs
+    const paragraphs = content.split('\n').filter(p => p.trim() !== '');
+    
+    return paragraphs.map((paragraph, idx) => (
+      <p key={idx} className="mb-4">{paragraph}</p>
+    ));
+  };
+  
+  // Determine if we're on the title page (first page)
+  const isTitlePage = currentPage === 0;
 
   return (
     <div className="flex flex-col items-center">
@@ -120,8 +135,8 @@ const StoryBook = ({ childName, pages, artStyle }: StoryBookProps) => {
         Art style: {artStyle}
       </p>
       
-      {/* Book container */}
-      <div className="relative w-full max-w-3xl aspect-[3/2] bg-white rounded-lg shadow-lg mb-8 overflow-hidden">
+      {/* Book container with rounded corners and shading to look book-like */}
+      <div className="relative w-full max-w-3xl aspect-[3/2] bg-[#FFF9F5] rounded-lg shadow-lg mb-8 overflow-hidden border-2 border-[#E6D7CC]">
         {/* Page counter */}
         <div className="absolute top-2 right-2 bg-white/80 text-gray-500 px-2 py-1 rounded-md text-xs">
           Page {currentPage + 1} of {totalPages}
@@ -131,9 +146,19 @@ const StoryBook = ({ childName, pages, artStyle }: StoryBookProps) => {
         <div className="flex h-full">
           {/* Page content */}
           <div className="flex-1 p-8 overflow-auto flex flex-col justify-between">
-            <div className="prose prose-lg">
-              {loadedPages[currentPage]?.content || pages[currentPage]?.content}
-            </div>
+            {isTitlePage ? (
+              <div className="h-full flex flex-col items-center justify-center">
+                <h1 className="text-3xl md:text-4xl font-display text-legend-blue mb-6">
+                  {childName}'s Magical Adventure
+                </h1>
+                <p className="text-xl font-story text-gray-600 mb-4">A personalized tale of wonder</p>
+                <p className="font-story text-lg text-gray-500 mt-8">Written just for {childName}</p>
+              </div>
+            ) : (
+              <div className="prose prose-lg max-w-none font-story leading-relaxed text-lg">
+                {formatPageContent(loadedPages[currentPage]?.content || pages[currentPage]?.content)}
+              </div>
+            )}
           </div>
           
           {/* Page illustration */}
@@ -222,14 +247,25 @@ const StoryBook = ({ childName, pages, artStyle }: StoryBookProps) => {
           <div 
             key={index} 
             className={cn(
-              "card p-6 bg-white rounded-lg shadow transition-all",
+              "card p-6 bg-[#FFF9F5] rounded-lg shadow transition-all border border-[#E6D7CC]",
               currentPage === index ? "scale-100 opacity-100" : "scale-95 opacity-50"
             )}
           >
-            <h3 className="font-semibold mb-2">Page {index + 1}</h3>
-            <div className="prose mb-4">
-              {page.content}
-            </div>
+            {index === 0 ? (
+              <div className="text-center mb-4">
+                <h3 className="text-2xl font-display text-legend-blue mb-2">
+                  {childName}'s Magical Adventure
+                </h3>
+                <p className="text-sm font-story text-gray-600">A personalized tale of wonder</p>
+              </div>
+            ) : (
+              <>
+                <h3 className="font-semibold mb-2">Page {index + 1}</h3>
+                <div className="prose font-story mb-4">
+                  {formatPageContent(page.content)}
+                </div>
+              </>
+            )}
             {loading[index] ? (
               <div className="flex flex-col items-center justify-center py-8 text-gray-400">
                 <Loader2 className="h-8 w-8 animate-spin mb-2" />
