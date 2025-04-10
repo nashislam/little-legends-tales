@@ -19,7 +19,8 @@ const queryClient = new QueryClient();
 
 // Add a VersionChecker component to avoid cluttering the main App component
 const VersionChecker = () => {
-  useVersionCheck();
+  // Check every 30 seconds (30000ms)
+  useVersionCheck(30000);
   return null;
 };
 

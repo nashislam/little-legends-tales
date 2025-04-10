@@ -6,11 +6,11 @@ import { toast } from '@/components/ui/use-toast';
  * Hook to periodically check for app updates by comparing the current version
  * with the version in the version.json file.
  * 
- * @param interval - Interval in milliseconds between checks (default: 60000ms / 1 minute)
+ * @param interval - Interval in milliseconds between checks (default: 30000ms / 30 seconds)
  * @param showToast - Whether to show a toast notification when an update is available (default: true)
  */
 export const useVersionCheck = (
-  interval: number = 60000,
+  interval: number = 30000,
   showToast: boolean = true
 ) => {
   useEffect(() => {
@@ -20,8 +20,15 @@ export const useVersionCheck = (
     // Initial version check on mount
     const checkVersion = async () => {
       try {
-        // Use cache-busting parameter to ensure fresh response
-        const res = await fetch(`/version.json${cacheBuster()}`);
+        // Force bypass of all caches with cache-busting parameter and fetch options
+        const res = await fetch(`/version.json${cacheBuster()}`, {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache'
+          }
+        });
+        
         if (!res.ok) return;
         
         const data = await res.json();
@@ -43,10 +50,12 @@ export const useVersionCheck = (
             
             // Give the toast time to display before reloading
             setTimeout(() => {
-              window.location.reload();
+              // Force reload by bypassing cache
+              window.location.reload(true);
             }, 2000);
           } else {
-            window.location.reload();
+            // Force reload by bypassing cache
+            window.location.reload(true);
           }
         }
       } catch (error) {

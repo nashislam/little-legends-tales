@@ -8,9 +8,10 @@ const packagePath = path.join(__dirname, '..', 'package.json');
 const packageData = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
 const version = packageData.version || '1.0.0';
 
-// Create version data
+// Create version data with a unique timestamp-based suffix to force updates
+const timestamp = Date.now();
 const versionData = {
-  version: `${version}-${Date.now().toString(36)}`, // Add timestamp hash to force updates
+  version: `${version}-${timestamp}`, // Will always be unique
   buildTime: new Date().toISOString()
 };
 
