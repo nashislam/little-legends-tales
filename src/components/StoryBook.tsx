@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { generateImagesForAllPages, retryImageForPage } from './storybook/ImageGenerationService';
 import BookContainer from './storybook/BookContainer';
@@ -172,6 +173,7 @@ const StoryBook = ({ childName, pages, artStyle, storyText = "" }: StoryBookProp
       onNextPage={nextPage}
       onPrevPage={prevPage}
       onRetryImageGeneration={retryImageGeneration}
+      setCurrentPage={setCurrentPage}
     />
   );
 };

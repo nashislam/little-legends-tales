@@ -17,6 +17,7 @@ interface BookContainerProps {
   onNextPage: () => void;
   onPrevPage: () => void;
   onRetryImageGeneration: (pageIndex: number) => Promise<void>;
+  setCurrentPage: (page: number) => void;
 }
 
 const BookContainer = ({ 
@@ -27,7 +28,8 @@ const BookContainer = ({
   loading, 
   onNextPage, 
   onPrevPage,
-  onRetryImageGeneration 
+  onRetryImageGeneration,
+  setCurrentPage
 }: BookContainerProps) => {
   const [fullscreen, setFullscreen] = useState(false);
   const [isBookOpen, setIsBookOpen] = useState(false);
@@ -99,8 +101,8 @@ const BookContainer = ({
               />
             ) : (
               <>
-                {/* Current page content */}
-                <div className="flex-1 p-5">
+                {/* Current page content - only shown on desktop */}
+                <div className="flex-1 p-5 hidden md:block">
                   <BookContent 
                     content={loadedPages[currentPage]?.content || ""}
                     image={loadedPages[currentPage]?.image}
@@ -114,8 +116,8 @@ const BookContainer = ({
                   />
                 </div>
                 
-                {/* Navigation controls */}
-                <div className="px-6 py-3 bg-white/50 backdrop-blur-sm border-t border-[#E6D7CC]">
+                {/* Navigation controls - only shown on desktop */}
+                <div className="px-6 py-3 bg-white/50 backdrop-blur-sm border-t border-[#E6D7CC] hidden md:block">
                   <NavigationControls 
                     currentPage={currentPage}
                     totalPages={totalPages}
@@ -129,22 +131,19 @@ const BookContainer = ({
         </div>
       </div>
       
-      {/* Mobile view with stack layout */}
+      {/* Mobile view with swipeable layout */}
       <div className={cn(
-        "md:hidden mt-6 space-y-16 pb-16 w-full px-6",
+        "md:hidden mt-6 space-y-16 pb-16 w-full px-4",
         fullscreen || !isBookOpen ? "hidden" : "block"
       )}>
-        {loadedPages.map((page, index) => (
-          <MobilePageCards
-            key={index}
-            page={page}
-            index={index}
-            currentPage={currentPage}
-            childName={childName}
-            loading={loading[index]}
-            onRetryImage={() => onRetryImageGeneration(index)}
-          />
-        ))}
+        <MobilePageCards
+          pages={loadedPages}
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+          childName={childName}
+          loading={loading}
+          onRetryImage={onRetryImageGeneration}
+        />
       </div>
     </div>
   );
