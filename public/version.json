@@ -1,5 +1,5 @@
 
 {
   "version": "1.0.0",
-  "buildTime": "${new Date().toISOString()}"
+  "buildTime": "2025-04-11T04:38:33Z"
 }

@@ -10,7 +10,7 @@ import { toast } from '@/components/ui/use-toast';
  * @param showToast - Whether to show a toast notification when an update is available
  */
 export const useVersionCheck = (
-  interval: number = 30000,
+  interval: number = 60000, // Changed to 60 seconds to reduce request frequency
   showToast: boolean = true
 ) => {
   useEffect(() => {
@@ -28,9 +28,19 @@ export const useVersionCheck = (
           }
         });
         
-        if (!res.ok) return;
+        if (!res.ok) {
+          console.warn('Could not check for updates - version.json not available');
+          return;
+        }
         
         const data = await res.json();
+        
+        // Validate the data has the expected structure
+        if (!data || typeof data.version !== 'string') {
+          console.error('Invalid version.json format');
+          return;
+        }
+        
         const currentVersion = localStorage.getItem('appVersion');
         
         // If first load or version has changed

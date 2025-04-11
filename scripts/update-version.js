@@ -3,15 +3,14 @@
 const fs = require('fs');
 const path = require('path');
 
-// Get version from package.json or use timestamp
+// Get version from package.json or use default
 const packagePath = path.join(__dirname, '..', 'package.json');
 const packageData = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
 const version = packageData.version || '1.0.0';
 
-// Create version data with a unique timestamp-based suffix to force updates
-const timestamp = Date.now();
+// Create version data with current timestamp
 const versionData = {
-  version: `${version}-${timestamp}`, // Will always be unique
+  version: version,
   buildTime: new Date().toISOString()
 };
 
