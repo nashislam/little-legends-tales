@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Book, Maximize2, Minimize2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
@@ -5,6 +6,7 @@ import { cn } from '@/lib/utils';
 import NavigationControls from './NavigationControls';
 import BookContent from './BookContent';
 import MobilePageCards from './MobilePageCards';
+import BookCover from './BookCover';
 
 interface BookContainerProps {
   childName: string;
@@ -28,11 +30,16 @@ const BookContainer = ({
   onRetryImageGeneration 
 }: BookContainerProps) => {
   const [fullscreen, setFullscreen] = useState(false);
+  const [isBookOpen, setIsBookOpen] = useState(false);
   const isTitlePage = currentPage === 0;
   const isEvenPage = currentPage % 2 === 0;
   
   const toggleFullscreen = () => {
     setFullscreen(!fullscreen);
+  };
+  
+  const handleOpenBook = () => {
+    setIsBookOpen(true);
   };
 
   return (
@@ -51,9 +58,11 @@ const BookContainer = ({
           </div>
           
           <div className="flex items-center gap-3">
-            <span className="text-sm text-gray-500 font-story">
-              {currentPage + 1} of {totalPages}
-            </span>
+            {isBookOpen && (
+              <span className="text-sm text-gray-500 font-story">
+                {currentPage + 1} of {totalPages}
+              </span>
+            )}
             <Button 
               variant="ghost" 
               size="icon"
@@ -77,30 +86,42 @@ const BookContainer = ({
             "relative w-full h-full flex flex-col",
             "shadow-[0_0_40px_rgba(0,0,0,0.05)_inset,_0_0_0_1px_rgba(0,0,0,0.03)_inset]"
           )}>
-            {/* Current page content */}
-            <div className="flex-1 p-5">
-              <BookContent 
-                content={loadedPages[currentPage]?.content || ""}
-                image={loadedPages[currentPage]?.image}
-                imageError={loadedPages[currentPage]?.imageError}
-                loading={loading[currentPage]}
-                currentPage={currentPage}
-                isTitlePage={isTitlePage}
+            {/* Show either the book cover or the book content based on state */}
+            {!isBookOpen ? (
+              <BookCover
                 childName={childName}
-                onRetryImage={onRetryImageGeneration}
-                isEvenPage={isEvenPage}
+                image={loadedPages[0]?.image}
+                loading={loading[0]}
+                onOpenBook={handleOpenBook}
               />
-            </div>
-            
-            {/* Navigation controls */}
-            <div className="px-6 py-3 bg-white/50 backdrop-blur-sm border-t border-[#E6D7CC]">
-              <NavigationControls 
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPrevPage={onPrevPage}
-                onNextPage={onNextPage}
-              />
-            </div>
+            ) : (
+              <>
+                {/* Current page content */}
+                <div className="flex-1 p-5">
+                  <BookContent 
+                    content={loadedPages[currentPage]?.content || ""}
+                    image={loadedPages[currentPage]?.image}
+                    imageError={loadedPages[currentPage]?.imageError}
+                    loading={loading[currentPage]}
+                    currentPage={currentPage}
+                    isTitlePage={isTitlePage}
+                    childName={childName}
+                    onRetryImage={onRetryImageGeneration}
+                    isEvenPage={isEvenPage}
+                  />
+                </div>
+                
+                {/* Navigation controls */}
+                <div className="px-6 py-3 bg-white/50 backdrop-blur-sm border-t border-[#E6D7CC]">
+                  <NavigationControls 
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPrevPage={onPrevPage}
+                    onNextPage={onNextPage}
+                  />
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -108,7 +129,7 @@ const BookContainer = ({
       {/* Mobile view with stack layout */}
       <div className={cn(
         "md:hidden mt-6 space-y-16 pb-16 w-full px-6",
-        fullscreen ? "hidden" : "block"
+        fullscreen || !isBookOpen ? "hidden" : "block"
       )}>
         {loadedPages.map((page, index) => (
           <MobilePageCards
