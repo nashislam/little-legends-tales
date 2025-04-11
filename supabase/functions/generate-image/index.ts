@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 
@@ -16,7 +15,7 @@ serve(async (req) => {
   }
 
   try {
-    const { prompt, artStyle, pageNumber = 0, previousPages = [] } = await req.json();
+    const { prompt, artStyle, pageNumber = 0 } = await req.json();
     
     if (!prompt) {
       return new Response(
@@ -54,15 +53,25 @@ serve(async (req) => {
       storybook: "Classic storybook illustration with warm colors and fairy tale quality."
     };
     
-    // Create a simplified prompt that focuses on the key elements
-    const enhancedPrompt = `Children's book illustration: ${prompt} Style: ${artStylePrompts[artStyle as keyof typeof artStylePrompts] || "Children's book illustration style."}`;
+    // Create a simplified prompt focused on key elements
+    let enhancedPrompt = `Children's book illustration: ${prompt.substring(0, 250)}`;
     
-    // Set a timeout for the OpenAI request
+    // Add art style information
+    if (artStyle && artStylePrompts[artStyle as keyof typeof artStylePrompts]) {
+      enhancedPrompt += ` Style: ${artStylePrompts[artStyle as keyof typeof artStylePrompts]}`;
+    } else {
+      enhancedPrompt += " Style: Children's book illustration style.";
+    }
+    
+    // Keep prompt to a reasonable length
+    enhancedPrompt = enhancedPrompt.substring(0, 500);
+    
+    // Set a shorter timeout for the OpenAI request (15 seconds)
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 25000); // 25 second timeout
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
     
     try {
-      // Call OpenAI API with improved parameters
+      // Call OpenAI API with optimized parameters
       const response = await fetch('https://api.openai.com/v1/images/generations', {
         method: 'POST',
         headers: {
@@ -70,10 +79,10 @@ serve(async (req) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: "dall-e-2", // Switch to DALL-E 2 for faster generation
+          model: "dall-e-2", // Use DALL-E 2 for faster generation
           prompt: enhancedPrompt,
           n: 1,
-          size: "512x512", // Smaller size for faster generation
+          size: "256x256", // Smaller size for faster generation
           response_format: "url",
         }),
         signal: controller.signal,

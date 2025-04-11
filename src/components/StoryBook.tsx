@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { generateImagesForAllPages, retryImageForPage } from './storybook/ImageGenerationService';
 import BookContainer from './storybook/BookContainer';
@@ -32,21 +31,40 @@ const StoryBook = ({ childName, pages, artStyle, storyText = "" }: StoryBookProp
     // Copy the pages initially
     setLoadedPages([...pages]);
     
-    // Generate images for all pages
+    // Generate images for all pages with a focus on the cover first
     const generateAllImages = async () => {
       try {
-        // Set loading state
-        setLoading(Array(pages.length).fill(true));
+        // Generate the cover image first
+        console.log("Prioritizing cover image generation...");
+        const coverLoading = [...initialLoading];
         
-        // Generate consistent images across all pages
+        try {
+          const coverImage = await retryImageForPage(pages[0], 0, artStyle);
+          const updatedPages = [...pages];
+          updatedPages[0] = { ...updatedPages[0], image: coverImage, imageError: false };
+          setLoadedPages(updatedPages);
+          coverLoading[0] = false;
+          setLoading(coverLoading);
+        } catch (error) {
+          console.error("Error generating cover image:", error);
+          coverLoading[0] = false;
+          setLoading(coverLoading);
+        }
+        
+        // After the cover is done, generate the rest in the background
+        console.log("Generating remaining images...");
         const updatedPages = await generateImagesForAllPages(
-          pages, 
+          loadedPages, 
           childName, 
           artStyle,
           storyText
         );
         
-        // Update with completed pages
+        // Update with completed pages, but keep our cover image
+        if (updatedPages[0]?.image) {
+          updatedPages[0] = { ...updatedPages[0], image: updatedPages[0].image };
+        }
+        
         setLoadedPages(updatedPages);
         setImageGenerationAttempted(true);
         

@@ -1,4 +1,4 @@
-import { generateStoryImage, generateConsistentStoryImages } from "@/lib/storyUtils";
+import { generateStoryImage } from "@/lib/storyUtils";
 
 interface Page {
   content: string;
@@ -10,7 +10,7 @@ interface Page {
 const MAX_CONCURRENT_REQUESTS = 2;
 
 /**
- * Generate images for all pages with concurrency control
+ * Generate images for all pages with concurrency control and prioritization
  */
 export const generateImagesForAllPages = async (
   pages: Page[], 
@@ -21,81 +21,40 @@ export const generateImagesForAllPages = async (
   try {
     console.log(`Starting image generation for ${pages.length} pages with art style: ${artStyle}`);
     
-    // First, try to generate consistent images
-    try {
-      // Prioritize the cover image generation
-      const coverPrompt = `A beautiful book cover image for a children's story featuring ${childName}. Art style: ${artStyle}. The image should be detailed and magical.`;
-      
-      console.log("Generating cover image first with prompt:", coverPrompt);
-      
-      // Attempt to generate the cover image first
-      try {
-        const coverImage = await generateStoryImage(coverPrompt, 0, artStyle);
-        pages[0].image = coverImage;
-        pages[0].imageError = false;
-      } catch (error) {
-        console.error("Error generating cover image:", error);
-        pages[0].imageError = true;
-        pages[0].image = `${import.meta.env.BASE_URL}placeholder.svg`;
-      }
-      
-      // Then generate the rest of the images consistently
-      const updatedPages = await generateConsistentStoryImages(
-        pages, 
-        childName, 
-        "magical creature", // Default animal if none provided
-        artStyle,
-        storyText
-      );
-      
-      // Keep our cover image
-      if (!updatedPages[0].imageError && pages[0].image) {
-        updatedPages[0].image = pages[0].image;
-      }
-      
-      return updatedPages;
-    } catch (error) {
-      console.error('Error generating consistent images, falling back to individual generation:', error);
-      
-      // Fall back to generating images one by one with concurrency control
-      const updatedPages = [...pages];
-      const chunks = [];
-      
-      // Ensure the cover (first page) is generated first
-      try {
-        const coverPrompt = `A beautiful book cover image for a children's story. Art style: ${artStyle}. The image should be detailed and magical.`;
-        const coverImage = await generateStoryImage(coverPrompt, 0, artStyle);
-        updatedPages[0].image = coverImage;
-        updatedPages[0].imageError = false;
-      } catch (error) {
-        console.error("Error generating cover image:", error);
-        updatedPages[0].imageError = true;
-        updatedPages[0].image = `${import.meta.env.BASE_URL}placeholder.svg`;
-      }
-      
-      // Split the remaining pages into chunks based on MAX_CONCURRENT_REQUESTS
-      for (let i = 1; i < updatedPages.length; i += MAX_CONCURRENT_REQUESTS) {
-        chunks.push(updatedPages.slice(i, i + MAX_CONCURRENT_REQUESTS));
-      }
-      
-      // Process each chunk sequentially, but pages within a chunk concurrently
-      for (const chunk of chunks) {
-        await Promise.all(chunk.map(async (page, index) => {
-          const pageIndex = chunks.indexOf(chunk) * MAX_CONCURRENT_REQUESTS + index + 1; // +1 because we already processed page 0
-          try {
-            const imageUrl = await generateStoryImage(page.content, pageIndex, artStyle);
-            updatedPages[pageIndex].image = imageUrl;
-            updatedPages[pageIndex].imageError = false;
-          } catch (error) {
-            console.error(`Error generating image for page ${pageIndex}:`, error);
-            updatedPages[pageIndex].image = `${import.meta.env.BASE_URL}placeholder.svg`;
-            updatedPages[pageIndex].imageError = true;
-          }
-        }));
-      }
-      
-      return updatedPages;
+    // Create a copy of pages that we'll update
+    const updatedPages = [...pages];
+    
+    // Skip the cover image (page 0) since we generate it separately first
+    // Process remaining pages with concurrency control
+    const pagesToProcess = updatedPages.slice(1);
+    const chunks = [];
+    
+    // Split the pages into chunks based on MAX_CONCURRENT_REQUESTS
+    for (let i = 0; i < pagesToProcess.length; i += MAX_CONCURRENT_REQUESTS) {
+      chunks.push(pagesToProcess.slice(i, i + MAX_CONCURRENT_REQUESTS));
     }
+    
+    // Process each chunk sequentially, but pages within a chunk concurrently
+    for (const chunk of chunks) {
+      await Promise.all(chunk.map(async (page, index) => {
+        const pageIndex = chunks.indexOf(chunk) * MAX_CONCURRENT_REQUESTS + index + 1; // +1 because we already processed page 0
+        try {
+          // Add a small delay between chunks to prevent rate limiting
+          const delay = chunks.indexOf(chunk) * 100;
+          if (delay > 0) await new Promise(resolve => setTimeout(resolve, delay));
+          
+          const imageUrl = await generateStoryImage(page.content, pageIndex, artStyle);
+          updatedPages[pageIndex].image = imageUrl;
+          updatedPages[pageIndex].imageError = false;
+        } catch (error) {
+          console.error(`Error generating image for page ${pageIndex}:`, error);
+          updatedPages[pageIndex].image = `${import.meta.env.BASE_URL}placeholder.svg`;
+          updatedPages[pageIndex].imageError = true;
+        }
+      }));
+    }
+    
+    return updatedPages;
   } catch (error) {
     console.error('Error in image generation service:', error);
     return pages.map(page => ({
@@ -107,7 +66,7 @@ export const generateImagesForAllPages = async (
 };
 
 /**
- * Retry image generation for a specific page
+ * Retry image generation for a specific page with improved performance
  */
 export const retryImageForPage = async (
   page: Page,
@@ -116,12 +75,9 @@ export const retryImageForPage = async (
 ): Promise<string> => {
   console.log(`Retrying image generation for page ${pageIndex} with art style: ${artStyle}`);
   try {
-    // Add a small delay to prevent rapid retries
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
     // If this is the cover page (index 0), use a special prompt
     if (pageIndex === 0) {
-      const coverPrompt = `A beautiful book cover image for a children's story. Art style: ${artStyle}. The image should be detailed and magical.`;
+      const coverPrompt = `A beautiful book cover image for a children's story. Art style: ${artStyle}. The image should be magical and child-friendly, perfect as a storybook cover.`;
       return await generateStoryImage(coverPrompt, pageIndex, artStyle);
     }
     

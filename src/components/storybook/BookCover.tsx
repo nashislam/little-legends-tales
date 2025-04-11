@@ -21,15 +21,31 @@ const BookCover = ({ image, childName, loading, onOpenBook }: BookCoverProps) =>
         "bg-gradient-to-b from-[#F9F5F2] to-[#F5EFE9]",
         "book-cover shadow-[0_10px_50px_rgba(0,0,0,0.2)]"
       )}
+      onClick={onOpenBook} // Make the entire cover clickable
     >
       {/* Book cover image */}
-      {image && (
+      {image ? (
         <div className="absolute inset-0 w-full h-full">
           <img 
             src={image} 
             alt={`${childName}'s story book cover`} 
             className="w-full h-full object-cover"
           />
+        </div>
+      ) : loading ? (
+        <div className="absolute inset-0 flex items-center justify-center bg-gray-100/50">
+          <div className="animate-pulse flex flex-col items-center">
+            <div className="w-32 h-32 rounded-full bg-gray-200"></div>
+            <div className="mt-4 text-gray-400">Creating your cover...</div>
+          </div>
+        </div>
+      ) : (
+        <div className="absolute inset-0 flex items-center justify-center bg-gray-100/50">
+          <div className="flex flex-col items-center">
+            <div className="w-32 h-32 rounded-full bg-gray-200 flex items-center justify-center">
+              <Book size={48} className="text-gray-400" />
+            </div>
+          </div>
         </div>
       )}
       
@@ -44,16 +60,20 @@ const BookCover = ({ image, childName, loading, onOpenBook }: BookCoverProps) =>
         </div>
       </div>
       
-      {/* Open book button */}
+      {/* Open book button - made more prominent */}
       <Button 
-        onClick={onOpenBook}
+        onClick={(e) => {
+          e.stopPropagation(); // Prevent the cover click event from firing
+          onOpenBook();
+        }}
         className={cn(
           "absolute bottom-12 animate-bounce",
           "bg-legend-blue hover:bg-blue-600 text-white",
-          "flex items-center gap-2 rounded-full px-6 py-3 shadow-lg"
+          "flex items-center gap-2 rounded-full px-8 py-5 shadow-lg",
+          "text-lg font-medium"
         )}
       >
-        <Book size={18} />
+        <Book size={22} />
         Open Book
       </Button>
       

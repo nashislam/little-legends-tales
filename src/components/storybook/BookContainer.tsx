@@ -39,7 +39,10 @@ const BookContainer = ({
   };
   
   const handleOpenBook = () => {
+    console.log("Opening book...");
     setIsBookOpen(true);
+    // Set page to 1 which is the first content page (after title)
+    onNextPage();
   };
 
   return (
@@ -106,7 +109,7 @@ const BookContainer = ({
                     currentPage={currentPage}
                     isTitlePage={isTitlePage}
                     childName={childName}
-                    onRetryImage={onRetryImageGeneration}
+                    onRetryImage={() => onRetryImageGeneration(currentPage)}
                     isEvenPage={isEvenPage}
                   />
                 </div>
@@ -139,7 +142,7 @@ const BookContainer = ({
             currentPage={currentPage}
             childName={childName}
             loading={loading[index]}
-            onRetryImage={onRetryImageGeneration}
+            onRetryImage={() => onRetryImageGeneration(index)}
           />
         ))}
       </div>
