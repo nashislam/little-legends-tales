@@ -27,6 +27,28 @@ const Page = ({
   onRetryImage,
   isEvenPage
 }: PageProps) => {
+  // For title pages, we always want to show the illustration with the title overlay
+  if (isTitlePage) {
+    return (
+      <div className="grid grid-cols-1 h-full board-book-page">
+        <div className={cn(
+          "bg-[#FFF9F5] rounded-3xl p-6 flex flex-col justify-center shadow-inner",
+          "relative overflow-hidden"
+        )}>
+          <PageIllustration 
+            loading={loading}
+            imageError={imageError}
+            image={image}
+            pageNumber={currentPage}
+            onRetry={onRetryImage}
+            isTitlePage={true}
+            childName={childName}
+          />
+        </div>
+      </div>
+    );
+  }
+  
   // Determine the order of content and illustration based on even/odd page
   const contentFirst = isEvenPage;
   

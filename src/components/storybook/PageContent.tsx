@@ -21,15 +21,7 @@ const PageContent = ({ content, isTitlePage, childName }: PageContentProps) => {
   };
 
   if (isTitlePage) {
-    return (
-      <div className="h-full flex flex-col items-center justify-center text-center p-8">
-        <h1 className="text-4xl md:text-5xl font-display text-[#5D5FEF] mb-8 leading-tight">
-          {childName}'s<br/>Magical<br/>Adventure
-        </h1>
-        <div className="w-20 h-1 bg-legend-yellow rounded-full my-6"></div>
-        <p className="text-2xl font-story text-gray-600 mt-6">A personalized tale of wonder</p>
-      </div>
-    );
+    return null; // Return null for title pages as they'll be handled differently
   }
 
   return (

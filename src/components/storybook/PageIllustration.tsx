@@ -11,6 +11,8 @@ interface PageIllustrationProps {
   image?: string;
   pageNumber: number;
   onRetry: (pageIndex: number) => Promise<void>;
+  isTitlePage?: boolean;
+  childName?: string;
 }
 
 const PageIllustration = ({ 
@@ -18,7 +20,9 @@ const PageIllustration = ({
   imageError, 
   image, 
   pageNumber,
-  onRetry 
+  onRetry,
+  isTitlePage,
+  childName
 }: PageIllustrationProps) => {
   const [imageLoadError, setImageLoadError] = useState(false);
   
@@ -81,6 +85,20 @@ const PageIllustration = ({
             )}
             onError={handleImageError}
           />
+          
+          {/* Overlay title on the image for title pages */}
+          {isTitlePage && childName && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-8 z-10">
+              <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg">
+                <h1 className="text-3xl md:text-4xl font-display text-[#5D5FEF] mb-4 leading-tight">
+                  {childName}'s<br/>Magical<br/>Adventure
+                </h1>
+                <div className="w-20 h-1 bg-legend-yellow rounded-full my-4 mx-auto"></div>
+                <p className="text-xl font-story text-gray-600 mt-4">A personalized tale of wonder</p>
+              </div>
+            </div>
+          )}
+          
           <div className="absolute -bottom-2 right-0 p-2 bg-white/70 backdrop-blur-sm rounded-full px-3 text-xs text-gray-500 font-story">
             {pageNumber + 1}
           </div>
