@@ -9,7 +9,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { useIsMobile } from '@/hooks/use-mobile';
-import { type EmblaCarouselType } from 'embla-carousel-react';
+import { type UseEmblaCarouselType } from 'embla-carousel-react';
 
 interface MobilePageCardsProps {
   pages: Array<{
@@ -64,7 +64,7 @@ const MobilePageCards = ({
           loop: false,
           startIndex: currentPage,
         }}
-        onSelect={(api: EmblaCarouselType) => {
+        onSelect={(api: UseEmblaCarouselType[1]) => {
           if (api) {
             const selectedIndex = api.selectedScrollSnap();
             if (selectedIndex !== currentPage) {
