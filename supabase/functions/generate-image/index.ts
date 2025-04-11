@@ -40,46 +40,29 @@ serve(async (req) => {
       );
     }
 
-    console.log('Generating image with prompt:', prompt);
-    console.log('Page number:', pageNumber);
-    console.log('Previous pages context count:', previousPages.length);
+    // Log image generation attempt
+    console.log(`Generating image for page ${pageNumber} with art style: ${artStyle}`);
+    console.log(`Prompt length: ${prompt.length} characters`);
     
-    // Build a consistency-focused prompt
-    let enhancedPrompt = prompt;
+    // Enhanced art style prompts for better results
+    const artStylePrompts = {
+      watercolor: "Soft, dreamy watercolor illustration with gentle colors, suitable for children's books.",
+      cartoon: "Bright, playful cartoon illustration with bold outlines and vibrant colors.",
+      dreamy: "Ethereal, magical illustration with soft focus, glowing elements, and dreamy atmosphere.",
+      pixel: "Cute pixel art illustration with 16-bit style, nostalgic game-like appearance.",
+      comic: "Comic book style illustration with dynamic composition and bold colors.",
+      storybook: "Classic storybook illustration with warm colors and fairy tale quality."
+    };
     
-    // Add context about page sequence
-    if (pageNumber === 0) {
-      enhancedPrompt = `Title page illustration: ${enhancedPrompt}`;
-    } else {
-      enhancedPrompt = `Page ${pageNumber + 1} illustration: ${enhancedPrompt}`;
-    }
+    // Create a simplified prompt that focuses on the key elements
+    const enhancedPrompt = `Children's book illustration: ${prompt} Style: ${artStylePrompts[artStyle as keyof typeof artStylePrompts] || "Children's book illustration style."}`;
     
-    // Enhance the prompt based on art style
-    switch (artStyle) {
-      case 'watercolor':
-        enhancedPrompt += " Soft, dreamy watercolor illustration, gentle colors, suitable for children's book. Consistent character design throughout the story.";
-        break;
-      case 'cartoon':
-        enhancedPrompt += " Bright, playful cartoon illustration with bold outlines, vibrant colors, child-friendly. Consistent character design throughout the story.";
-        break;
-      case 'dreamy':
-        enhancedPrompt += " Ethereal, magical illustration with soft focus, glowing elements, and dreamy atmosphere. Consistent character design throughout the story.";
-        break;
-      case 'pixel':
-        enhancedPrompt += " Cute pixel art illustration, 16-bit style, nostalgic game-like appearance. Consistent character design throughout the story.";
-        break;
-      case 'comic':
-        enhancedPrompt += " Comic book style illustration with panels, speech bubbles, and action lines. Consistent character design throughout the story.";
-        break;
-      case 'storybook':
-        enhancedPrompt += " Classic storybook illustration, detailed, warm colors, fairy tale quality. Consistent character design throughout the story.";
-        break;
-      default:
-        enhancedPrompt += " Children's book illustration with consistent character design throughout the story.";
-    }
+    // Set a timeout for the OpenAI request
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 25000); // 25 second timeout
     
     try {
-      // Call OpenAI API to generate the image with enhanced consistency
+      // Call OpenAI API with improved parameters
       const response = await fetch('https://api.openai.com/v1/images/generations', {
         method: 'POST',
         headers: {
@@ -87,15 +70,16 @@ serve(async (req) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: "dall-e-3", // Using DALL-E 3 for better consistency
+          model: "dall-e-2", // Switch to DALL-E 2 for faster generation
           prompt: enhancedPrompt,
           n: 1,
-          size: "1024x1024", // Higher quality for better consistency
+          size: "512x512", // Smaller size for faster generation
           response_format: "url",
-          quality: "standard", // Adjust based on budget constraints
-          style: "vivid", // Helps maintain consistent color palettes
         }),
+        signal: controller.signal,
       });
+      
+      clearTimeout(timeoutId);
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -103,29 +87,28 @@ serve(async (req) => {
       }
 
       const data = await response.json();
-      console.log('Image generation response:', data);
-
-      if (!data.data || data.data.length === 0) {
-        throw new Error("No image generated");
-      }
+      console.log('Image generation successful');
 
       return new Response(
         JSON.stringify({ imageUrl: data.data[0].url }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     } catch (openaiError) {
-      // If OpenAI API fails, return a placeholder and error details
-      console.error('OpenAI API error:', openaiError);
+      console.error('OpenAI API error:', openaiError.name === 'AbortError' ? 'Request timed out' : openaiError);
+      
+      // If the request timed out or otherwise failed, return a placeholder
       return new Response(
         JSON.stringify({ 
           imageUrl: `${import.meta.env.BASE_URL || '/'}placeholder.svg`,
-          error: `Image generation failed: ${openaiError.message || "Unknown error"}`
+          error: openaiError.name === 'AbortError' ? 
+            "Image generation timed out. Try again later." : 
+            `Image generation failed: ${openaiError.message || "Unknown error"}`
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
   } catch (error) {
-    console.error('Error generating image:', error);
+    console.error('Error processing request:', error);
     return new Response(
       JSON.stringify({ 
         error: error.message || 'An unknown error occurred',
@@ -135,4 +118,3 @@ serve(async (req) => {
     );
   }
 });
-
