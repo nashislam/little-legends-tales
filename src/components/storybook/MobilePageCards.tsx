@@ -64,12 +64,15 @@ const MobilePageCards = ({
           loop: false,
           startIndex: currentPage,
         }}
-        onSelect={(api: UseEmblaCarouselType[1]) => {
+        setApi={(api) => {
           if (api) {
-            const selectedIndex = api.selectedScrollSnap();
-            if (selectedIndex !== currentPage) {
-              setCurrentPage(selectedIndex);
-            }
+            // Update page when carousel changes
+            api.on('select', () => {
+              const selectedIndex = api.selectedScrollSnap();
+              if (selectedIndex !== currentPage) {
+                setCurrentPage(selectedIndex);
+              }
+            });
           }
         }}
       >
