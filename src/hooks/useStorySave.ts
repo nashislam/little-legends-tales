@@ -4,10 +4,13 @@ import { useAuth } from '@/lib/auth';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { type StoryResponse } from '@/lib/openai';
+import { useNavigate } from 'react-router-dom';
+import { Button } from "@/components/ui/button";
 
 export const useStorySave = (storyData: StoryResponse | null, formData: any) => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [saving, setSaving] = useState(false);
   const [storySaved, setStorySaved] = useState(false);
 
@@ -42,7 +45,7 @@ export const useStorySave = (storyData: StoryResponse | null, formData: any) => 
         variant: "default",
         action: (
           <Button onClick={() => navigate("/auth")}>Login</Button>
-        ),
+        )
       });
       return;
     }
