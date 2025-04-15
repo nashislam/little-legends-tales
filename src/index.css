@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Open+Sans:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -50,7 +51,7 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 
@@ -138,10 +139,6 @@
 
   .container-card {
     @apply bg-white rounded-3xl p-6 shadow-lg border border-gray-100;
-  }
-  
-  .input-field {
-    @apply border border-gray-200 rounded-xl p-3 w-full focus:outline-none focus:ring-2 focus:ring-legend-blue;
   }
 }
 

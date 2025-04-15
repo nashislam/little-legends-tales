@@ -1,3 +1,4 @@
+
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { BookOpen, LogOut, User, BookMarked, Settings } from "lucide-react";
@@ -21,18 +22,18 @@ const Navbar = () => {
   const isAdmin = user?.email === 'nasheet.islam@gmail.com';
 
   return (
-    <nav className="w-full py-4 px-4 md:px-8 border-b">
+    <nav className="w-full py-4 px-4 md:px-8 bg-white/80 backdrop-blur-sm border-b sticky top-0 z-50">
       <div className="container mx-auto flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
           <BookOpen className="h-8 w-8 text-legend-blue" />
-          <span className="font-display text-2xl text-foreground">Little Legends</span>
+          <span className="font-display text-2xl text-gray-800">Little Legends</span>
         </Link>
         
         <div className="hidden md:flex items-center gap-6">
-          <Link to="/" className="font-semibold hover:text-legend-blue transition-colors">
+          <Link to="/" className="text-gray-600 hover:text-legend-blue transition-colors">
             Home
           </Link>
-          <Link to="/how-it-works" className="font-semibold hover:text-legend-blue transition-colors">
+          <Link to="/how-it-works" className="text-gray-600 hover:text-legend-blue transition-colors">
             How It Works
           </Link>
           
@@ -94,7 +95,7 @@ const Navbar = () => {
             </DropdownMenu>
           ) : (
             <Link to="/auth">
-              <Button variant="outline" className="rounded-full px-6">
+              <Button variant="outline" className="rounded-full px-6 border-legend-blue text-legend-blue hover:bg-legend-blue hover:text-white">
                 Login
               </Button>
             </Link>
