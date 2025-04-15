@@ -1,7 +1,6 @@
-
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { BookOpen, LogOut, User, Book, BookMarked } from "lucide-react";
+import { BookOpen, LogOut, User, BookMarked, Settings } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -18,6 +17,8 @@ const Navbar = () => {
   const getInitials = (email: string) => {
     return email.substring(0, 2).toUpperCase();
   };
+
+  const isAdmin = user?.email === 'nasheet.islam@gmail.com';
 
   return (
     <nav className="w-full py-4 px-4 md:px-8 border-b">
@@ -65,6 +66,22 @@ const Navbar = () => {
                     <span>My Saved Stories</span>
                   </Link>
                 </DropdownMenuItem>
+                
+                {isAdmin && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem 
+                      className="flex items-center gap-2" 
+                      asChild
+                    >
+                      <Link to="/admin/prompt-lab">
+                        <Settings className="h-4 w-4" />
+                        <span>Admin</span>
+                      </Link>
+                    </DropdownMenuItem>
+                  </>
+                )}
+                
                 <DropdownMenuSeparator />
                 <DropdownMenuItem 
                   className="flex items-center gap-2 text-red-600" 
