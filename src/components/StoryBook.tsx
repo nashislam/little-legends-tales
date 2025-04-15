@@ -1,5 +1,7 @@
+
 import React, { useState, useEffect } from 'react';
 import { generateConsistentStoryImages } from '@/lib/story/imageService';
+import { supabase } from '@/integrations/supabase/client';
 import BookContainer from './storybook/BookContainer';
 import { useToast } from '@/hooks/use-toast';
 
