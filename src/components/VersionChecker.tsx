@@ -4,10 +4,11 @@ import { useVersionCheck } from "@/hooks/useVersionCheck";
 import { toast } from "@/components/ui/use-toast";
 
 const VersionChecker = () => {
-  useVersionCheck(30000); // Check every 30 seconds
+  // Check more frequently - every 15 seconds
+  useVersionCheck(15000); 
   
   useEffect(() => {
-    // Force a version check on first load
+    // Force a version check on first load with aggressive cache busting
     const checkInitialVersion = async () => {
       try {
         const cacheBuster = `?_=${Date.now()}`;
@@ -29,6 +30,8 @@ const VersionChecker = () => {
         
         if (!storedVersion) {
           localStorage.setItem('appVersion', data.version);
+          // Force reload on first visit to ensure latest assets
+          window.location.reload();
         } else if (storedVersion !== data.version) {
           localStorage.setItem('appVersion', data.version);
           toast({
@@ -36,6 +39,9 @@ const VersionChecker = () => {
             description: "Application has been updated with the latest features.",
             duration: 5000,
           });
+          
+          // Force reload to get fresh assets
+          setTimeout(() => window.location.reload(), 1000);
         }
       } catch (error) {
         console.error('Initial version check failed:', error);
@@ -52,9 +58,21 @@ const VersionChecker = () => {
       }
     };
     
+    // Add a small visible version indicator to help debug cache issues
+    const versionIndicator = document.createElement('div');
+    versionIndicator.style.position = 'fixed';
+    versionIndicator.style.bottom = '2px';
+    versionIndicator.style.right = '2px';
+    versionIndicator.style.fontSize = '8px';
+    versionIndicator.style.color = '#aaa';
+    versionIndicator.style.zIndex = '9999';
+    versionIndicator.textContent = `v1.0.5`;
+    document.body.appendChild(versionIndicator);
+    
     window.addEventListener('pageshow', handlePageShow);
     return () => {
       window.removeEventListener('pageshow', handlePageShow);
+      document.body.removeChild(versionIndicator);
     };
   }, []);
   

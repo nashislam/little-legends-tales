@@ -10,7 +10,7 @@ import { toast } from '@/components/ui/use-toast';
  * @param showToast - Whether to show a toast notification when an update is available
  */
 export const useVersionCheck = (
-  interval: number = 30000,
+  interval: number = 15000, // Default to 15 seconds
   showToast: boolean = true
 ) => {
   useEffect(() => {
@@ -43,6 +43,7 @@ export const useVersionCheck = (
         }
         
         const currentVersion = localStorage.getItem('appVersion');
+        console.log(`Checking version: current=${currentVersion}, latest=${data.version}`);
         
         // If first load or version has changed
         if (!currentVersion) {
@@ -77,8 +78,10 @@ export const useVersionCheck = (
                 });
               }
               
-              window.location.reload();
-            }, 2000);
+              // Force reload with cache clearing
+              window.location.href = window.location.href.split('?')[0] + 
+                '?cache=' + Date.now();
+            }, 1000);
           } else {
             window.location.reload();
           }

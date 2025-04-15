@@ -1,6 +1,7 @@
 
 import { Routes, Route } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
+import VersionChecker from "@/components/VersionChecker";
 import "./App.css";
 
 // Import components
@@ -18,6 +19,7 @@ import Index from "./pages/Index";
 function App() {
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <VersionChecker />
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/auth" element={<Auth />} />
