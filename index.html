@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -12,7 +13,16 @@
     <meta http-equiv="Expires" content="0" />
 
     <link rel="icon" href="/public/lovable-uploads/59ecd956-9306-46b8-b826-e0a4f0a48c1f.png" type="image/png">
-
+    
+    <!-- Preconnect to resources to speed up loading -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.gpteng.co">
+    
+    <!-- Preload critical fonts -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet"></noscript>
+    
     <!-- Force HTTPS on production domain -->
     <script>
       if (window.location.hostname === "littlelegends.app" && window.location.protocol === "http:") {
@@ -34,9 +44,8 @@
     <meta name="twitter:description" content="Make your child the star of their own adventure. Beautiful, personalized storybooks designed to inspire joy, wonder & self-belief." />
     <meta name="twitter:image" content="/public/lovable-uploads/59ecd956-9306-46b8-b826-e0a4f0a48c1f.png" />
     
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=Fredoka+One&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Load remaining fonts after critical content -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
   </head>
 
   <body>

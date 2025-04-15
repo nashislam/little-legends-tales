@@ -10,7 +10,7 @@ import { toast } from '@/components/ui/use-toast';
  * @param showToast - Whether to show a toast notification when an update is available
  */
 export const useVersionCheck = (
-  interval: number = 30000, // More frequent checks (30 seconds)
+  interval: number = 30000,
   showToast: boolean = true
 ) => {
   useEffect(() => {
@@ -43,7 +43,6 @@ export const useVersionCheck = (
         }
         
         const currentVersion = localStorage.getItem('appVersion');
-        console.log('Current version:', currentVersion, 'Server version:', data.version);
         
         // If first load or version has changed
         if (!currentVersion) {
@@ -61,43 +60,31 @@ export const useVersionCheck = (
             
             // Give the toast time to display before reloading
             setTimeout(() => {
-              // Clear cache before reload
-              clearBrowserCache();
-              window.location.reload(); // Remove the parameter here
+              // Clear browser caches through service worker if available
+              if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistrations().then(registrations => {
+                  registrations.forEach(registration => {
+                    registration.update();
+                  });
+                });
+              }
+              
+              if ('caches' in window) {
+                caches.keys().then(names => {
+                  names.forEach(name => {
+                    caches.delete(name);
+                  });
+                });
+              }
+              
+              window.location.reload();
             }, 2000);
           } else {
-            clearBrowserCache();
-            window.location.reload(); // Remove the parameter here
+            window.location.reload();
           }
         }
       } catch (error) {
         console.error('Failed to check for app version:', error);
-      }
-    };
-
-    // Clear browser cache function
-    const clearBrowserCache = () => {
-      // Clear application cache if available
-      if ('caches' in window) {
-        caches.keys().then((names) => {
-          names.forEach((name) => {
-            caches.delete(name);
-          });
-        });
-      }
-      
-      // Clear local storage except appVersion
-      const appVersion = localStorage.getItem('appVersion');
-      localStorage.clear();
-      if (appVersion) {
-        localStorage.setItem('appVersion', appVersion);
-      }
-      
-      // Try to clear session storage
-      try {
-        sessionStorage.clear();
-      } catch (e) {
-        console.warn('Could not clear session storage', e);
       }
     };
 

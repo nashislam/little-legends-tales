@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
-import { useToast } from '@/hooks/use-toast';
+import { toast } from '@/components/ui/use-toast';
 
 interface StoryDisplayProps {
   story: string;
@@ -12,7 +12,6 @@ interface StoryDisplayProps {
 
 const StoryDisplay = ({ story, childName, artStyle }: StoryDisplayProps) => {
   const [isPdfLoading, setIsPdfLoading] = useState(false);
-  const { toast } = useToast();
 
   // Simple function to convert the story to a downloadable PDF
   const downloadAsPdf = () => {

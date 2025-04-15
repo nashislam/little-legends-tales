@@ -1,9 +1,10 @@
 
-# Prevent caching for HTML and root path
+# Cache control for various file types
 /
   Cache-Control: no-store, no-cache, must-revalidate, private
   Pragma: no-cache
   Expires: 0
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.gpteng.co; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://images.unsplash.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co; frame-src 'none'; upgrade-insecure-requests;
 
 /index.html
   Cache-Control: no-store, no-cache, must-revalidate, private
@@ -15,10 +16,33 @@
   Cache-Control: no-store, no-cache, must-revalidate, private
   Pragma: no-cache
   Expires: 0
+  
+# Performance optimizations
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  X-XSS-Protection: 1; mode=block
+  Referrer-Policy: strict-origin-when-cross-origin
 
-# Allow caching for assets with fingerprinting
+# Allow strong caching for static assets with fingerprinting
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
+  
+# Cache fonts for a long time - they rarely change
+/*.woff2
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.woff
+  Cache-Control: public, max-age=31536000, immutable
+
+# Images can be cached for longer periods
+/*.png
+  Cache-Control: public, max-age=86400
+
+/*.jpg
+  Cache-Control: public, max-age=86400
+
+/*.svg
+  Cache-Control: public, max-age=86400
 
 # API endpoints should never be cached
 /api/*

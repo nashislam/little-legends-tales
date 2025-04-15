@@ -20,18 +20,44 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  // Add build configuration for proper caching headers
+  // Optimize build for performance
   build: {
+    target: 'es2020', // Modern browsers for better performance
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true, // Remove console logs in production
+        drop_debugger: true
+      }
+    },
     rollupOptions: {
       output: {
         // Add proper cache busting by including content hashes in file names
         entryFileNames: 'assets/[name].[hash].js',
         chunkFileNames: 'assets/[name].[hash].js',
         assetFileNames: 'assets/[name].[hash].[ext]',
+        // Split vendor chunks for better caching
+        manualChunks: {
+          vendor: ['react', 'react-dom', 'react-router-dom'],
+          ui: ['@/components/ui'],
+        },
       },
     },
+    // Enable chunk size warning to identify large bundles
+    chunkSizeWarningLimit: 500,
   },
-  // Generate headers file for deployment platforms that support it (like Netlify, Vercel)
+  // Improve CSS processing
+  css: {
+    postcss: {
+      plugins: [
+        require('autoprefixer'),
+        require('cssnano')({
+          preset: 'advanced',
+        }),
+      ],
+    },
+  },
+  // Generate headers file for deployment platforms that support it
   experimental: {
     renderBuiltUrl(filename, { hostType }) {
       // Apply hash-based URLs only for browser-rendered URLs

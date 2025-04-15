@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { cn } from '@/lib/utils';
 import Page from './Page';
 
 interface BookContentProps {
@@ -15,30 +14,9 @@ interface BookContentProps {
   isEvenPage: boolean;
 }
 
-const BookContent = ({
-  content,
-  image,
-  imageError,
-  loading,
-  currentPage,
-  isTitlePage,
-  childName,
-  onRetryImage,
-  isEvenPage
-}: BookContentProps) => {
-  return (
-    <Page
-      content={content}
-      image={image}
-      imageError={imageError}
-      loading={loading}
-      currentPage={currentPage}
-      isTitlePage={isTitlePage}
-      childName={childName}
-      onRetryImage={onRetryImage}
-      isEvenPage={isEvenPage}
-    />
-  );
+// Simplified component that directly passes props to Page
+const BookContent = (props: BookContentProps) => {
+  return <Page {...props} />;
 };
 
 export default BookContent;

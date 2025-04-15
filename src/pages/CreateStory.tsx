@@ -1,9 +1,11 @@
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import Navbar from "@/components/Navbar";
-import StoryForm from "@/components/StoryForm";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
+
+// Lazy load the form for better initial load times
+const StoryForm = lazy(() => import("@/components/StoryForm"));
 
 // Define a simple type for the preferences check
 type PreferenceCheck = {
@@ -13,11 +15,15 @@ type PreferenceCheck = {
 const CreateStory = () => {
   const { user } = useAuth();
   const [hasPreferences, setHasPreferences] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Check if user has saved preferences
   useEffect(() => {
     const checkUserPreferences = async () => {
-      if (!user) return;
+      if (!user) {
+        setIsLoading(false);
+        return;
+      }
       
       try {
         // Use type assertion to allow accessing user_preferences
@@ -33,6 +39,8 @@ const CreateStory = () => {
         }
       } catch (error) {
         console.error('Error checking user preferences:', error);
+      } finally {
+        setIsLoading(false);
       }
     };
     
@@ -58,7 +66,16 @@ const CreateStory = () => {
             </p>
           </div>
           
-          <StoryForm />
+          <Suspense fallback={
+            <div className="text-center py-10">
+              <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" role="status">
+                <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">Loading...</span>
+              </div>
+              <p className="mt-4 text-gray-600">Loading story creation form...</p>
+            </div>
+          }>
+            {!isLoading && <StoryForm />}
+          </Suspense>
         </div>
       </div>
     </div>
