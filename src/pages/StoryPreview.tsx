@@ -1,194 +1,20 @@
 
-import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
-import { useAuth } from "@/lib/auth";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import StoryBook from "@/components/StoryBook";
-import { Download, Save, Share } from "lucide-react";
-import { type StoryResponse } from "@/lib/openai";
-
-interface PageData {
-  content: string;
-  image?: string;
-  imagePrompt?: string;
-  imageError?: boolean;
-  pageNumber: number;
-}
+import StoryActions from "@/components/story/StoryActions";
+import { useStoryState } from "@/hooks/useStoryState";
+import { useStorySave } from "@/hooks/useStorySave";
 
 const StoryPreview = () => {
-  const location = useLocation();
   const navigate = useNavigate();
-  const { user } = useAuth();
   const { toast } = useToast();
-  const [saving, setSaving] = useState(false);
   const [downloading, setDownloading] = useState(false);
-  const [storyData, setStoryData] = useState<StoryResponse | null>(null);
-  const [formData, setFormData] = useState<any>(null);
-  const [storyPages, setStoryPages] = useState<PageData[]>([]);
-  const [storySaved, setStorySaved] = useState(false);
-
-  useEffect(() => {
-    if (location.state?.pages || location.state?.story) {
-      // Handle both new format and legacy format
-      const data = location.state;
-      setFormData(location.state.formData);
-      
-      if (data.pages) {
-        // New format with structured pages
-        setStoryData(data);
-        
-        // Convert the structured pages to our display format
-        // Start with the cover page
-        const allPages: PageData[] = [
-          {
-            pageNumber: 0,
-            content: "Cover Page",
-            imagePrompt: data.coverPrompt,
-          }
-        ];
-        
-        // Add content pages
-        data.pages.forEach((page: any) => {
-          allPages.push({
-            pageNumber: page.pageNumber,
-            content: page.content,
-            imagePrompt: page.imagePrompt,
-          });
-        });
-        
-        // Add back cover
-        if (data.backCoverPrompt) {
-          allPages.push({
-            pageNumber: allPages.length,
-            content: "Back Cover",
-            imagePrompt: data.backCoverPrompt,
-          });
-        }
-        
-        setStoryPages(allPages);
-      } else {
-        // Legacy format with just story text
-        const storyText = data.story;
-        
-        // Use our updated splitStoryIntoPages function that creates a title page
-        const pages = [];
-        
-        // Add title page
-        pages.push({
-          pageNumber: 0,
-          content: "Title Page",
-        });
-        
-        // Split the story by paragraphs and create pages
-        const paragraphs = storyText.split('\n\n').filter((p: string) => p.trim() !== '');
-        const paragraphsPerPage = 2;
-        
-        for (let i = 0; i < paragraphs.length; i += paragraphsPerPage) {
-          const pageContent = paragraphs.slice(i, i + paragraphsPerPage).join('\n\n');
-          pages.push({
-            pageNumber: pages.length,
-            content: pageContent,
-          });
-        }
-        
-        // Ensure we have at least two pages (title + content)
-        if (pages.length === 1) {
-          pages.push({
-            pageNumber: 1,
-            content: storyText || "Once upon a time..."
-          });
-        }
-        
-        setStoryPages(pages);
-      }
-    } else {
-      navigate("/create");
-    }
-  }, [location.state, navigate]);
-
-  // Check if story is already saved on component mount
-  useEffect(() => {
-    const checkStorySaved = async () => {
-      if (!user || !storyData?.story) return;
-      
-      try {
-        const { data, error } = await supabase
-          .from('stories')
-          .select('id')
-          .eq('user_id', user.id)
-          .eq('content', storyData.story)
-          .maybeSingle();
-        
-        if (data) {
-          setStorySaved(true);
-        }
-      } catch (error) {
-        console.error('Error checking saved story:', error);
-      }
-    };
-    
-    checkStorySaved();
-  }, [user, storyData]);
-
-  const handleSaveStory = async () => {
-    if (!user) {
-      toast({
-        title: "Login Required",
-        description: "Please login or create an account to save your story.",
-        variant: "default",
-        action: (
-          <Button onClick={() => navigate("/auth")}>Login</Button>
-        ),
-      });
-      return;
-    }
-
-    if (!storyData || !formData) {
-      toast({
-        title: "Error",
-        description: "No story data available to save.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    setSaving(true);
-    try {
-      const { error } = await supabase
-        .from('stories')
-        .insert({
-          user_id: user.id,
-          content: storyData.story,
-          child_name: formData?.childName || "",
-          child_age: formData?.childAge || "",
-          favorite_animal: formData?.favoriteAnimal || "",
-          magical_power: formData?.magicalPower || "",
-          characters: formData?.characters || "",
-          art_style: formData?.artStyle || "",
-          structured_content: storyData.pages ? JSON.stringify(storyData) : null,
-        });
-
-      if (error) throw error;
-
-      toast({
-        title: "Story Saved!",
-        description: "Your story has been saved to your account.",
-      });
-      setStorySaved(true);
-    } catch (error) {
-      console.error("Error saving story:", error);
-      toast({
-        title: "Failed to Save",
-        description: "There was an error saving your story. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setSaving(false);
-    }
-  };
+  
+  const { storyData, formData, storyPages } = useStoryState();
+  const { saving, storySaved, handleSaveStory } = useStorySave(storyData, formData);
 
   const downloadAsPdf = () => {
     setDownloading(true);
@@ -236,34 +62,13 @@ const StoryPreview = () => {
             />
           )}
           
-          <div className="flex flex-col md:flex-row justify-center gap-4 mt-8">
-            <Button 
-              onClick={handleSaveStory}
-              className="bg-legend-blue hover:bg-blue-600 text-white flex items-center gap-2"
-              disabled={saving || storySaved}
-            >
-              <Save size={18} />
-              {saving ? "Saving..." : storySaved ? "Story Saved" : "Save Story"}
-            </Button>
-            
-            <Button 
-              onClick={downloadAsPdf}
-              className="flex items-center gap-2"
-              variant="outline"
-              disabled={downloading}
-            >
-              <Download size={18} />
-              {downloading ? "Preparing PDF..." : "Download PDF"}
-            </Button>
-            
-            <Button 
-              onClick={() => navigate("/create")}
-              variant="outline"
-              className="border-2 border-legend-pink text-legend-pink hover:bg-legend-pink hover:text-white"
-            >
-              Create Another Story
-            </Button>
-          </div>
+          <StoryActions
+            onSave={handleSaveStory}
+            onDownload={downloadAsPdf}
+            saving={saving}
+            downloading={downloading}
+            storySaved={storySaved}
+          />
         </div>
       </div>
     </div>
