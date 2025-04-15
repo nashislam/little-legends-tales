@@ -54,7 +54,7 @@ export default defineConfig(({ mode }) => ({
       plugins: [
         autoprefixer,
         cssnano({
-          preset: 'advanced',
+          preset: 'default',
         }),
       ],
     },
