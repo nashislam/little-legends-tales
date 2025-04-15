@@ -1,6 +1,5 @@
-
 import React, { useState, useEffect } from 'react';
-import { generateConsistentStoryImages } from '@/lib/storyUtils';
+import { generateConsistentStoryImages } from '@/lib/story/imageService';
 import BookContainer from './storybook/BookContainer';
 import { useToast } from '@/hooks/use-toast';
 
@@ -31,14 +30,11 @@ const StoryBook = ({ childName, pages, artStyle, storyText = "" }: StoryBookProp
     const initialLoading = Array(pages.length).fill(true);
     setLoading(initialLoading);
     
-    // Copy the pages initially
     setLoadedPages([...pages]);
     
-    // Generate images for all pages with a focus on the cover first
     const generateAllImages = async () => {
       try {
         console.log("Generating images for pages with prompts:", pages);
-        // Update with pages that have image prompts in them
         const updatedPages = await generateConsistentStoryImages(
           loadedPages, 
           childName, 
@@ -48,7 +44,6 @@ const StoryBook = ({ childName, pages, artStyle, storyText = "" }: StoryBookProp
         setLoadedPages(updatedPages);
         setImageGenerationAttempted(true);
         
-        // Check if we have any errors
         const hasErrors = updatedPages.some(page => page.imageError);
         if (hasErrors) {
           toast({
@@ -65,7 +60,6 @@ const StoryBook = ({ childName, pages, artStyle, storyText = "" }: StoryBookProp
           variant: "destructive"
         });
       } finally {
-        // Mark all pages as loaded regardless of success/failure
         setLoading(Array(pages.length).fill(false));
       }
     };
@@ -86,7 +80,6 @@ const StoryBook = ({ childName, pages, artStyle, storyText = "" }: StoryBookProp
   };
 
   const retryImageGeneration = async (pageIndex: number) => {
-    // Mark the page as loading
     const newLoadingStates = [...loading];
     newLoadingStates[pageIndex] = true;
     setLoading(newLoadingStates);
@@ -97,11 +90,9 @@ const StoryBook = ({ childName, pages, artStyle, storyText = "" }: StoryBookProp
         description: "Creating a new picture for this page...",
       });
       
-      // Use the prompt directly from the page if available
       const pageToRetry = loadedPages[pageIndex];
       const prompt = pageToRetry.imagePrompt || pageToRetry.content;
       
-      // Get a new image
       const { data, error } = await supabase.functions.invoke('generate-image', {
         body: {
           prompt,
@@ -113,7 +104,6 @@ const StoryBook = ({ childName, pages, artStyle, storyText = "" }: StoryBookProp
         throw new Error('Failed to generate image');
       }
       
-      // Update the page with the new image
       const updatedPages = [...loadedPages];
       updatedPages[pageIndex] = { 
         ...updatedPages[pageIndex], 
@@ -143,7 +133,6 @@ const StoryBook = ({ childName, pages, artStyle, storyText = "" }: StoryBookProp
       });
     }
     
-    // Mark as no longer loading
     newLoadingStates[pageIndex] = false;
     setLoading(newLoadingStates);
   };
