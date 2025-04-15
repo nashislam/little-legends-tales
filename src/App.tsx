@@ -17,6 +17,7 @@ import NotFound from "./pages/NotFound";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import AdminPromptLab from "./pages/AdminPromptLab";
 import HowItWorksPage from "./pages/HowItWorks";
+import "./App.css";
 
 // Initialize QueryClient outside of component to prevent recreation on re-renders
 const queryClient = new QueryClient({
