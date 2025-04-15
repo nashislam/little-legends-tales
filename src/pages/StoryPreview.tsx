@@ -7,8 +7,16 @@ import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import StoryBook from "@/components/StoryBook";
-import { splitStoryIntoPages } from "@/lib/storyUtils";
 import { Download, Save, Share } from "lucide-react";
+import { type StoryResponse } from "@/lib/openai";
+
+interface PageData {
+  content: string;
+  image?: string;
+  imagePrompt?: string;
+  imageError?: boolean;
+  pageNumber: number;
+}
 
 const StoryPreview = () => {
   const location = useLocation();
@@ -17,20 +25,85 @@ const StoryPreview = () => {
   const { toast } = useToast();
   const [saving, setSaving] = useState(false);
   const [downloading, setDownloading] = useState(false);
-  const [story, setStory] = useState<string>("");
+  const [storyData, setStoryData] = useState<StoryResponse | null>(null);
   const [formData, setFormData] = useState<any>(null);
-  const [storyPages, setStoryPages] = useState<any[]>([]);
+  const [storyPages, setStoryPages] = useState<PageData[]>([]);
   const [storySaved, setStorySaved] = useState(false);
 
   useEffect(() => {
-    if (location.state?.story) {
-      const storyText = location.state.story;
-      setStory(storyText);
+    if (location.state?.pages || location.state?.story) {
+      // Handle both new format and legacy format
+      const data = location.state;
       setFormData(location.state.formData);
       
-      // Use our updated splitStoryIntoPages function that creates a title page
-      const pages = splitStoryIntoPages(storyText);
-      setStoryPages(pages);
+      if (data.pages) {
+        // New format with structured pages
+        setStoryData(data);
+        
+        // Convert the structured pages to our display format
+        // Start with the cover page
+        const allPages: PageData[] = [
+          {
+            pageNumber: 0,
+            content: "Cover Page",
+            imagePrompt: data.coverPrompt,
+          }
+        ];
+        
+        // Add content pages
+        data.pages.forEach((page: any) => {
+          allPages.push({
+            pageNumber: page.pageNumber,
+            content: page.content,
+            imagePrompt: page.imagePrompt,
+          });
+        });
+        
+        // Add back cover
+        if (data.backCoverPrompt) {
+          allPages.push({
+            pageNumber: allPages.length,
+            content: "Back Cover",
+            imagePrompt: data.backCoverPrompt,
+          });
+        }
+        
+        setStoryPages(allPages);
+      } else {
+        // Legacy format with just story text
+        const storyText = data.story;
+        
+        // Use our updated splitStoryIntoPages function that creates a title page
+        const pages = [];
+        
+        // Add title page
+        pages.push({
+          pageNumber: 0,
+          content: "Title Page",
+        });
+        
+        // Split the story by paragraphs and create pages
+        const paragraphs = storyText.split('\n\n').filter((p: string) => p.trim() !== '');
+        const paragraphsPerPage = 2;
+        
+        for (let i = 0; i < paragraphs.length; i += paragraphsPerPage) {
+          const pageContent = paragraphs.slice(i, i + paragraphsPerPage).join('\n\n');
+          pages.push({
+            pageNumber: pages.length,
+            content: pageContent,
+          });
+        }
+        
+        // Ensure we have at least two pages (title + content)
+        if (pages.length === 1) {
+          pages.push({
+            pageNumber: 1,
+            content: storyText || "Once upon a time..."
+          });
+        }
+        
+        setStoryPages(pages);
+      }
     } else {
       navigate("/create");
     }
@@ -39,14 +112,14 @@ const StoryPreview = () => {
   // Check if story is already saved on component mount
   useEffect(() => {
     const checkStorySaved = async () => {
-      if (!user || !story) return;
+      if (!user || !storyData?.story) return;
       
       try {
         const { data, error } = await supabase
           .from('stories')
           .select('id')
           .eq('user_id', user.id)
-          .eq('content', story)
+          .eq('content', storyData.story)
           .maybeSingle();
         
         if (data) {
@@ -58,7 +131,7 @@ const StoryPreview = () => {
     };
     
     checkStorySaved();
-  }, [user, story]);
+  }, [user, storyData]);
 
   const handleSaveStory = async () => {
     if (!user) {
@@ -73,19 +146,29 @@ const StoryPreview = () => {
       return;
     }
 
+    if (!storyData || !formData) {
+      toast({
+        title: "Error",
+        description: "No story data available to save.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setSaving(true);
     try {
       const { error } = await supabase
         .from('stories')
         .insert({
           user_id: user.id,
-          content: story,
+          content: storyData.story,
           child_name: formData?.childName || "",
           child_age: formData?.childAge || "",
           favorite_animal: formData?.favoriteAnimal || "",
           magical_power: formData?.magicalPower || "",
           characters: formData?.characters || "",
           art_style: formData?.artStyle || "",
+          structured_content: storyData.pages ? JSON.stringify(storyData) : null,
         });
 
       if (error) throw error;
@@ -119,7 +202,8 @@ const StoryPreview = () => {
       });
       
       const element = document.createElement('a');
-      const file = new Blob([`${formData?.childName || "Child"}'s Adventure\n\n${story}`], {type: 'text/plain'});
+      const storyText = storyData?.story || storyPages.map(p => p.content).join('\n\n');
+      const file = new Blob([`${formData?.childName || "Child"}'s Adventure\n\n${storyText}`], {type: 'text/plain'});
       element.href = URL.createObjectURL(file);
       element.download = `${formData?.childName || "Child"}'s Adventure.txt`;
       document.body.appendChild(element);
@@ -148,7 +232,7 @@ const StoryPreview = () => {
               childName={formData?.childName || "Child"} 
               pages={storyPages} 
               artStyle={formData?.artStyle || "watercolor"} 
-              storyText={story}
+              storyText={storyData?.story || ""}
             />
           )}
           

@@ -2,7 +2,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
-type StoryParams = {
+export type StoryParams = {
   childName: string;
   childAge: string;
   favoriteAnimal: string;
@@ -11,7 +11,18 @@ type StoryParams = {
   artStyle: string;
 };
 
-export const generateStory = async (params: StoryParams): Promise<string> => {
+export interface StoryResponse {
+  story: string;
+  pages: Array<{
+    pageNumber: number;
+    content: string;
+    imagePrompt: string;
+  }>;
+  coverPrompt: string;
+  backCoverPrompt: string;
+}
+
+export const generateStory = async (params: StoryParams): Promise<StoryResponse> => {
   try {
     console.log("Generating story with parameters:", params);
     
@@ -25,13 +36,13 @@ export const generateStory = async (params: StoryParams): Promise<string> => {
       throw new Error('Failed to generate story. Please try again.');
     }
 
-    if (!data?.story) {
-      console.error('No story data returned:', data);
-      throw new Error('No story generated. Please try again.');
+    if (!data?.pages || !data?.coverPrompt) {
+      console.error('Invalid response format returned:', data);
+      throw new Error('Invalid story format generated. Please try again.');
     }
 
-    console.log('Story successfully generated');
-    return data.story;
+    console.log('Story successfully generated with structured content');
+    return data;
   } catch (error) {
     console.error('Error in generateStory function:', error);
     throw error;

@@ -65,13 +65,13 @@ const StoryForm = () => {
         await saveUserPreferences();
       }
       
-      // Call OpenAI API to generate story
-      const story = await generateStory(formData);
+      // Call OpenAI API to generate story with structured pages
+      const storyResponse = await generateStory(formData);
       
       // Navigate to story preview page with the generated story
       navigate('/preview', { 
         state: { 
-          story,
+          ...storyResponse,
           formData,
           userId: user?.id || null // Allow for anonymous users
         } 

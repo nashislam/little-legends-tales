@@ -1,13 +1,15 @@
 
 import React, { useState, useEffect } from 'react';
-import { generateImagesForAllPages, retryImageForPage } from './storybook/ImageGenerationService';
+import { generateConsistentStoryImages } from '@/lib/storyUtils';
 import BookContainer from './storybook/BookContainer';
 import { useToast } from '@/hooks/use-toast';
 
 interface Page {
   content: string;
   image?: string;
+  imagePrompt?: string;
   imageError?: boolean;
+  pageNumber: number;
 }
 
 interface StoryBookProps {
@@ -35,36 +37,13 @@ const StoryBook = ({ childName, pages, artStyle, storyText = "" }: StoryBookProp
     // Generate images for all pages with a focus on the cover first
     const generateAllImages = async () => {
       try {
-        // Generate the cover image first
-        console.log("Prioritizing cover image generation...");
-        const coverLoading = [...initialLoading];
-        
-        try {
-          const coverImage = await retryImageForPage(pages[0], 0, artStyle);
-          const updatedPages = [...pages];
-          updatedPages[0] = { ...updatedPages[0], image: coverImage, imageError: false };
-          setLoadedPages(updatedPages);
-          coverLoading[0] = false;
-          setLoading(coverLoading);
-        } catch (error) {
-          console.error("Error generating cover image:", error);
-          coverLoading[0] = false;
-          setLoading(coverLoading);
-        }
-        
-        // After the cover is done, generate the rest in the background
-        console.log("Generating remaining images...");
-        const updatedPages = await generateImagesForAllPages(
+        console.log("Generating images for pages with prompts:", pages);
+        // Update with pages that have image prompts in them
+        const updatedPages = await generateConsistentStoryImages(
           loadedPages, 
           childName, 
-          artStyle,
-          storyText
+          artStyle
         );
-        
-        // Update with completed pages, but keep our cover image
-        if (updatedPages[0]?.image) {
-          updatedPages[0] = { ...updatedPages[0], image: updatedPages[0].image };
-        }
         
         setLoadedPages(updatedPages);
         setImageGenerationAttempted(true);
@@ -92,7 +71,7 @@ const StoryBook = ({ childName, pages, artStyle, storyText = "" }: StoryBookProp
     };
     
     generateAllImages();
-  }, [pages, childName, artStyle, storyText, toast]);
+  }, [pages, childName, artStyle, toast]);
 
   const nextPage = () => {
     if (currentPage < totalPages - 1) {
@@ -118,29 +97,35 @@ const StoryBook = ({ childName, pages, artStyle, storyText = "" }: StoryBookProp
         description: "Creating a new picture for this page...",
       });
       
-      const imageUrl = await retryImageForPage(loadedPages[pageIndex], pageIndex, artStyle);
-      const updatedPages = [...loadedPages];
-      const isPlaceholder = imageUrl.includes('placeholder');
+      // Use the prompt directly from the page if available
+      const pageToRetry = loadedPages[pageIndex];
+      const prompt = pageToRetry.imagePrompt || pageToRetry.content;
       
+      // Get a new image
+      const { data, error } = await supabase.functions.invoke('generate-image', {
+        body: {
+          prompt,
+          artStyle,
+        },
+      });
+      
+      if (error || !data?.imageUrl) {
+        throw new Error('Failed to generate image');
+      }
+      
+      // Update the page with the new image
+      const updatedPages = [...loadedPages];
       updatedPages[pageIndex] = { 
         ...updatedPages[pageIndex], 
-        image: imageUrl,
-        imageError: isPlaceholder
+        image: data.imageUrl,
+        imageError: false
       };
       setLoadedPages(updatedPages);
       
-      if (!isPlaceholder) {
-        toast({
-          title: "Success!",
-          description: "New illustration created successfully.",
-        });
-      } else {
-        toast({
-          title: "Still having trouble",
-          description: "We couldn't create an illustration. Try again later.",
-          variant: "destructive"
-        });
-      }
+      toast({
+        title: "Success!",
+        description: "New illustration created successfully.",
+      });
     } catch (error) {
       console.error(`Error retrying image generation for page ${pageIndex}:`, error);
       const updatedPages = [...loadedPages];
