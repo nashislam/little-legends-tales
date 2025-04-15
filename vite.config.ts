@@ -52,7 +52,7 @@ export default defineConfig(({ mode }) => ({
   css: {
     postcss: {
       plugins: [
-        autoprefixer,
+        autoprefixer(),
         cssnano({
           preset: 'default',
         }),
