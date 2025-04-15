@@ -14,7 +14,7 @@ interface BookContentProps {
   isEvenPage: boolean;
 }
 
-// Simplified component that directly passes props to Page
+// Component that passes props directly to Page
 const BookContent = (props: BookContentProps) => {
   return <Page {...props} />;
 };
