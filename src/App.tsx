@@ -5,7 +5,6 @@ import "./App.css";
 
 // Import components
 import Navbar from "./components/Navbar";
-import Hero from "./components/Hero";
 import Auth from "./pages/Auth";
 import CreateStory from "./pages/CreateStory";
 import StoryPreview from "./pages/StoryPreview";
@@ -14,13 +13,13 @@ import NotFound from "./pages/NotFound";
 import AdminPromptLab from "./pages/AdminPromptLab";
 import MySavedStories from "./pages/MySavedStories";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Index from "./pages/Index";
 
 function App() {
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Navbar />
       <Routes>
-        <Route path="/" element={<Hero />} />
+        <Route path="/" element={<Index />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/create" element={<CreateStory />} />
         <Route path="/preview" element={<StoryPreview />} />
