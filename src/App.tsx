@@ -16,6 +16,7 @@ import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import AdminPromptLab from "./pages/AdminPromptLab";
+import HowItWorksPage from "./pages/HowItWorks";
 
 // Initialize QueryClient outside of component to prevent recreation on re-renders
 const queryClient = new QueryClient({
@@ -40,6 +41,7 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/create" element={<CreateStory />} />
             <Route path="/preview" element={<StoryPreview />} />
+            <Route path="/how-it-works" element={<HowItWorksPage />} />
             <Route 
               path="/my-stories" 
               element={
