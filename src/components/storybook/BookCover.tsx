@@ -21,7 +21,6 @@ const BookCover = ({ image, childName, loading, onOpenBook }: BookCoverProps) =>
         "bg-gradient-to-b from-[#F9F5F2] to-[#F5EFE9]",
         "book-cover shadow-[0_10px_50px_rgba(0,0,0,0.2)]"
       )}
-      onClick={onOpenBook} // Make the entire cover clickable
     >
       {/* Book cover image */}
       {image ? (
@@ -62,10 +61,7 @@ const BookCover = ({ image, childName, loading, onOpenBook }: BookCoverProps) =>
       
       {/* Open book button - made more prominent */}
       <Button 
-        onClick={(e) => {
-          e.stopPropagation(); // Prevent the cover click event from firing
-          onOpenBook();
-        }}
+        onClick={onOpenBook}
         className={cn(
           "absolute bottom-12 animate-bounce",
           "bg-legend-blue hover:bg-blue-600 text-white",
@@ -78,7 +74,7 @@ const BookCover = ({ image, childName, loading, onOpenBook }: BookCoverProps) =>
       </Button>
       
       {/* Book spine decoration */}
-      <div className="absolute left-0 top-0 bottom-0 w-[20px] bg-gradient-to-r from-[#E6D7CC] to-[#F5F0EA] shadow-inner">
+      <div className="absolute left-0 top-0 bottom-0 w-[20px] bg-gradient-to-r from-[#E6D7CC] to-[#F5EFE9] shadow-inner">
         <div className="h-full w-full flex flex-col items-center justify-center">
           <div className="w-[2px] h-2/3 bg-[#0000001a]"></div>
         </div>
