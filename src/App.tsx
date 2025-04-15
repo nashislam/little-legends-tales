@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -15,6 +14,7 @@ import MySavedStories from "./pages/MySavedStories";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import AdminPromptLab from "./pages/AdminPromptLab";
 
 const queryClient = new QueryClient();
 
@@ -46,6 +46,7 @@ const App = () => (
               } 
             />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/admin/prompt-lab" element={<AdminPromptLab />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>

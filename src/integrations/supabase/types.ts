@@ -9,6 +9,68 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      admin_users: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+        }
+        Relationships: []
+      }
+      experiment_runs: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          input_parameters: Json
+          metrics: Json | null
+          model_used: string
+          output_images: Json | null
+          output_text: string | null
+          template_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          id?: string
+          input_parameters?: Json
+          metrics?: Json | null
+          model_used: string
+          output_images?: Json | null
+          output_text?: string | null
+          template_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          input_parameters?: Json
+          metrics?: Json | null
+          model_used?: string
+          output_images?: Json | null
+          output_text?: string | null
+          template_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "experiment_runs_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "prompt_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -30,6 +92,42 @@ export type Database = {
           id?: string
           updated_at?: string
           username?: string | null
+        }
+        Relationships: []
+      }
+      prompt_templates: {
+        Row: {
+          created_at: string
+          created_by: string
+          description: string | null
+          id: string
+          model_config: Json
+          name: string
+          system_message: string
+          updated_at: string
+          user_message: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          description?: string | null
+          id?: string
+          model_config?: Json
+          name: string
+          system_message: string
+          updated_at?: string
+          user_message: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          id?: string
+          model_config?: Json
+          name?: string
+          system_message?: string
+          updated_at?: string
+          user_message?: string
         }
         Relationships: []
       }
