@@ -1,42 +1,15 @@
 
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
-import { useToast } from "@/hooks/use-toast";
 import StoryBook from "@/components/StoryBook";
 import StoryActions from "@/components/story/StoryActions";
 import { useStoryState } from "@/hooks/useStoryState";
 import { useStorySave } from "@/hooks/useStorySave";
+import { useStoryDownload } from "@/hooks/useStoryDownload";
 
 const StoryPreview = () => {
-  const navigate = useNavigate();
-  const { toast } = useToast();
-  const [downloading, setDownloading] = useState(false);
-  
   const { storyData, formData, storyPages } = useStoryState();
   const { saving, storySaved, handleSaveStory } = useStorySave(storyData, formData);
-
-  const downloadAsPdf = () => {
-    setDownloading(true);
-    
-    setTimeout(() => {
-      setDownloading(false);
-      
-      toast({
-        title: "PDF Downloaded",
-        description: "Your story has been downloaded as a PDF.",
-      });
-      
-      const element = document.createElement('a');
-      const storyText = storyData?.story || storyPages.map(p => p.content).join('\n\n');
-      const file = new Blob([`${formData?.childName || "Child"}'s Adventure\n\n${storyText}`], {type: 'text/plain'});
-      element.href = URL.createObjectURL(file);
-      element.download = `${formData?.childName || "Child"}'s Adventure.txt`;
-      document.body.appendChild(element);
-      element.click();
-      document.body.removeChild(element);
-    }, 2000);
-  };
+  const { downloading, handleDownload } = useStoryDownload(storyData, formData);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-blue-50">
@@ -64,7 +37,7 @@ const StoryPreview = () => {
           
           <StoryActions
             onSave={handleSaveStory}
-            onDownload={downloadAsPdf}
+            onDownload={handleDownload}
             saving={saving}
             downloading={downloading}
             storySaved={storySaved}
