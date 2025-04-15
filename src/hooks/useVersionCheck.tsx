@@ -63,11 +63,11 @@ export const useVersionCheck = (
             setTimeout(() => {
               // Clear cache before reload
               clearBrowserCache();
-              window.location.reload(true); // Force reload from server
+              window.location.reload(); // Remove the parameter here
             }, 2000);
           } else {
             clearBrowserCache();
-            window.location.reload(true); // Force reload from server
+            window.location.reload(); // Remove the parameter here
           }
         }
       } catch (error) {
