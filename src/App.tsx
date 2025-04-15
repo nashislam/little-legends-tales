@@ -1,64 +1,25 @@
 
-import { useState } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "@/lib/auth";
-import VersionChecker from "@/components/VersionChecker";
-import ProtectedRoute from "@/components/ProtectedRoute";
-import Index from "./pages/Index";
-import CreateStory from "./pages/CreateStory";
-import StoryPreview from "./pages/StoryPreview";
-import MySavedStories from "./pages/MySavedStories";
-import Auth from "./pages/Auth";
-import NotFound from "./pages/NotFound";
-import PrivacyPolicy from "./pages/PrivacyPolicy";
-import AdminPromptLab from "./pages/AdminPromptLab";
-import HowItWorksPage from "./pages/HowItWorks";
 import "./App.css";
 
-// Initialize QueryClient outside of component to prevent recreation on re-renders
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 60000, // 1 minute
-      retry: 1,         // Reduce retry attempts
-    },
-  },
-});
+// Import components
+import Navbar from "./components/Navbar";
+import Hero from "./components/Hero";
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <BrowserRouter>
-        <AuthProvider>
-          <Toaster />
-          <Sonner />
-          <VersionChecker />
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/create" element={<CreateStory />} />
-            <Route path="/preview" element={<StoryPreview />} />
-            <Route path="/how-it-works" element={<HowItWorksPage />} />
-            <Route 
-              path="/my-stories" 
-              element={
-                <ProtectedRoute>
-                  <MySavedStories />
-                </ProtectedRoute>
-              } 
-            />
-            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-            <Route path="/admin/prompt-lab" element={<AdminPromptLab />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </AuthProvider>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+function App() {
+  return (
+    <Router>
+      <div className="min-h-screen flex flex-col bg-background">
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<Hero />} />
+          {/* Add additional routes as needed */}
+        </Routes>
+        <Toaster />
+      </div>
+    </Router>
+  );
+}
 
 export default App;
