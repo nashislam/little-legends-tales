@@ -1,12 +1,18 @@
 
 # Prevent caching for HTML and root path
 /
-  Cache-Control: no-store, no-cache, must-revalidate
+  Cache-Control: no-store, no-cache, must-revalidate, private
   Pragma: no-cache
   Expires: 0
 
 /index.html
-  Cache-Control: no-store, no-cache, must-revalidate
+  Cache-Control: no-store, no-cache, must-revalidate, private
+  Pragma: no-cache
+  Expires: 0
+
+# Special cache control for version file
+/version.json
+  Cache-Control: no-store, no-cache, must-revalidate, private
   Pragma: no-cache
   Expires: 0
 
@@ -16,8 +22,8 @@
 
 # API endpoints should never be cached
 /api/*
-  Cache-Control: no-store, no-cache, must-revalidate
+  Cache-Control: no-store, no-cache, must-revalidate, private
 
-# Default for other files - slightly shorter cache
+# Default for other files - very short cache
 /*
-  Cache-Control: public, max-age=3600
+  Cache-Control: public, max-age=60
