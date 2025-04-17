@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { BookOpen, LogOut, User, BookMarked, Settings } from "lucide-react";
@@ -11,9 +10,52 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import { useState, useEffect } from "react";
 
 const Navbar = () => {
-  const { user, signOut } = useAuth();
+  const [mounted, setMounted] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
+  
+  // Wait until hydration completes before trying to access auth context
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+  
+  // Early return with simple navbar if not mounted yet
+  if (!mounted) {
+    return (
+      <nav className="w-full py-4 px-4 md:px-8 bg-white/80 backdrop-blur-sm border-b sticky top-0 z-50">
+        <div className="container mx-auto flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-2">
+            <BookOpen className="h-8 w-8 text-blue-500" />
+            <span className="font-display text-2xl text-gray-800">Little Legends</span>
+          </Link>
+          <div className="animate-pulse bg-gray-200 h-8 w-24 rounded"></div>
+        </div>
+      </nav>
+    );
+  }
+  
+  // Now it's safe to access auth context
+  let user;
+  try {
+    const { user: authUser } = useAuth();
+    user = authUser;
+  } catch (error) {
+    console.error("Error accessing auth context:", error);
+    setAuthError(error instanceof Error ? error.message : "Auth context error");
+    return (
+      <nav className="w-full py-4 px-4 md:px-8 bg-white/80 backdrop-blur-sm border-b sticky top-0 z-50">
+        <div className="container mx-auto flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-2">
+            <BookOpen className="h-8 w-8 text-red-500" />
+            <span className="font-display text-2xl text-gray-800">Little Legends</span>
+          </Link>
+          <div className="text-xs text-red-500">Auth error: Reloading in 5s</div>
+        </div>
+      </nav>
+    );
+  }
 
   const getInitials = (email: string) => {
     return email.substring(0, 2).toUpperCase();
@@ -21,6 +63,7 @@ const Navbar = () => {
 
   const isAdmin = user?.email === 'nasheet.islam@gmail.com';
 
+  // Rest of the component can now safely use auth
   return (
     <nav className="w-full py-4 px-4 md:px-8 bg-white/80 backdrop-blur-sm border-b sticky top-0 z-50">
       <div className="container mx-auto flex items-center justify-between">
@@ -86,7 +129,10 @@ const Navbar = () => {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem 
                   className="flex items-center gap-2 text-red-600" 
-                  onClick={() => signOut()}
+                  onClick={() => {
+                    const auth = useAuth();
+                    auth.signOut();
+                  }}
                 >
                   <LogOut className="h-4 w-4" />
                   <span>Logout</span>
@@ -131,7 +177,10 @@ const Navbar = () => {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem 
                   className="flex items-center gap-2 text-red-600" 
-                  onClick={() => signOut()}
+                  onClick={() => {
+                    const auth = useAuth();
+                    auth.signOut();
+                  }}
                 >
                   <LogOut className="h-4 w-4" />
                   <span>Logout</span>

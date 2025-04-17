@@ -3,6 +3,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
+import { toast } from '@/components/ui/use-toast';
 
 type AuthContextType = {
   user: User | null;
@@ -29,33 +30,41 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Set up auth state listener FIRST
+    console.log("AuthProvider mounted");
+    
+    // Get the initial session
+    supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
+      console.log("Initial session check:", currentSession?.user?.email || "No session");
+      setSession(currentSession);
+      setUser(currentSession?.user ?? null);
+      setLoading(false);
+    }).catch(error => {
+      console.error("Error getting session:", error);
+      setLoading(false);
+    });
+    
+    // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, newSession) => {
         console.log('Auth state changed:', event);
         setSession(newSession);
         setUser(newSession?.user ?? null);
 
-        // Don't call Supabase methods directly in the callback
-        // Use setTimeout to avoid potential deadlocks
         if (event === 'SIGNED_IN') {
+          toast({
+            title: "Signed in",
+            description: `Welcome back, ${newSession?.user?.email}!`,
+          });
           setTimeout(() => navigate('/'), 0);
         } else if (event === 'SIGNED_OUT') {
+          toast({
+            title: "Signed out",
+            description: "You have been signed out successfully.",
+          });
           setTimeout(() => navigate('/auth'), 0);
         }
       }
     );
-
-    // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
-      setSession(currentSession);
-      setUser(currentSession?.user ?? null);
-      setLoading(false);
-      
-      if (currentSession?.user) {
-        console.log('User is already signed in:', currentSession.user.email);
-      }
-    });
 
     return () => {
       subscription.unsubscribe();
@@ -76,14 +85,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signInWithGoogle = async () => {
     // Get the current domain and use it for the redirect
-    // This will adapt to both HTTP and HTTPS automatically
     const domain = window.location.origin;
     console.log("Redirecting OAuth to:", `${domain}/auth`);
     
     // If we're in production and using littlelegends.app domain, force HTTPS
     let redirectUrl = `${domain}/auth`;
     if (domain.includes('littlelegends.app') && !domain.startsWith('https')) {
-      // Replace http with https for production domain
       redirectUrl = redirectUrl.replace('http:', 'https:');
       console.log("Forcing HTTPS for production redirect:", redirectUrl);
     }

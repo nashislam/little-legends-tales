@@ -4,36 +4,49 @@ import { useVersionCheck } from "@/hooks/useVersionCheck";
 import { toast } from "@/components/ui/use-toast";
 
 const VersionChecker = () => {
-  // Check more frequently - every 15 seconds
-  useVersionCheck(15000); 
+  // Check very frequently during troubleshooting - every 10 seconds
+  useVersionCheck(10000);
   
   useEffect(() => {
+    console.log("VersionChecker mounted - checking for updates");
+    
     // Force a version check on first load with aggressive cache busting
     const checkInitialVersion = async () => {
       try {
-        const cacheBuster = `?_=${Date.now()}`;
+        // Use a unique timestamp for each request to completely bypass cache
+        const cacheBuster = `?_=${Date.now()}-${Math.random()}`;
         const res = await fetch(`/version.json${cacheBuster}`, {
+          method: 'GET', // Explicitly set method
           cache: 'no-store',
           headers: {
             'Cache-Control': 'no-cache, no-store, must-revalidate',
             'Pragma': 'no-cache',
-            'Expires': '0'
+            'Expires': '0',
+            'X-Requested-With': 'XMLHttpRequest' // Some proxies treat XHR differently
           }
         });
         
-        if (!res.ok) return;
+        if (!res.ok) {
+          console.error(`Version check failed: ${res.status} ${res.statusText}`);
+          return;
+        }
         
         const data = await res.json();
         const storedVersion = localStorage.getItem('appVersion');
         
-        console.log('Initial version check:', storedVersion, data.version);
+        console.log('Initial version check:', { 
+          stored: storedVersion, 
+          latest: data.version,
+          buildTime: data.buildTime
+        });
         
         if (!storedVersion) {
           localStorage.setItem('appVersion', data.version);
-          // Force reload on first visit to ensure latest assets
-          window.location.reload();
+          console.log("First visit - storing version", data.version);
         } else if (storedVersion !== data.version) {
+          console.log(`Version changed from ${storedVersion} to ${data.version}`);
           localStorage.setItem('appVersion', data.version);
+          
           toast({
             title: "Updated to version " + data.version,
             description: "Application has been updated with the latest features.",
@@ -41,7 +54,14 @@ const VersionChecker = () => {
           });
           
           // Force reload to get fresh assets
-          setTimeout(() => window.location.reload(), 1000);
+          console.log("Forcing page reload to apply updates");
+          setTimeout(() => {
+            // Force hard reload with cache clearing
+            window.location.href = window.location.href.split('?')[0] + 
+              '?fresh=' + Date.now();
+          }, 1500);
+        } else {
+          console.log("Application is up to date");
         }
       } catch (error) {
         console.error('Initial version check failed:', error);
@@ -53,7 +73,7 @@ const VersionChecker = () => {
     // Check if this is a fresh page load (not from bfcache)
     const handlePageShow = (event: PageTransitionEvent) => {
       if (event.persisted) {
-        // Page was restored from bfcache, force a refresh
+        console.log("Page was restored from back-forward cache, forcing refresh");
         window.location.reload();
       }
     };
@@ -66,13 +86,26 @@ const VersionChecker = () => {
     versionIndicator.style.fontSize = '8px';
     versionIndicator.style.color = '#aaa';
     versionIndicator.style.zIndex = '9999';
-    versionIndicator.textContent = `v1.0.5`;
+    versionIndicator.textContent = `v1.0.6`;
     document.body.appendChild(versionIndicator);
     
     window.addEventListener('pageshow', handlePageShow);
+    
+    // Service worker unregistration to clear any cached assets
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(registrations => {
+        for (let registration of registrations) {
+          registration.unregister();
+          console.log('Service worker unregistered');
+        }
+      });
+    }
+    
     return () => {
       window.removeEventListener('pageshow', handlePageShow);
-      document.body.removeChild(versionIndicator);
+      if (document.body.contains(versionIndicator)) {
+        document.body.removeChild(versionIndicator);
+      }
     };
   }, []);
   

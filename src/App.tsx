@@ -1,5 +1,5 @@
 
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
 import VersionChecker from "@/components/VersionChecker";
 import "./App.css";
@@ -15,8 +15,16 @@ import AdminPromptLab from "./pages/AdminPromptLab";
 import MySavedStories from "./pages/MySavedStories";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Index from "./pages/Index";
+import { useEffect } from "react";
 
 function App() {
+  const location = useLocation();
+
+  // Log route changes to help with debugging
+  useEffect(() => {
+    console.log("Current route:", location.pathname);
+  }, [location.pathname]);
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <VersionChecker />
