@@ -1,3 +1,4 @@
+
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { BookOpen, LogOut, User, BookMarked, Settings } from "lucide-react";
@@ -24,10 +25,10 @@ const Navbar = () => {
   // Early return with simple navbar if not mounted yet
   if (!mounted) {
     return (
-      <nav className="w-full py-4 px-4 md:px-8 bg-white/80 backdrop-blur-sm border-b sticky top-0 z-50">
+      <nav className="w-full py-4 px-4 md:px-8 bg-white sticky top-0 z-50">
         <div className="container mx-auto flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
-            <BookOpen className="h-8 w-8 text-blue-500" />
+            <BookOpen className="h-6 w-6 text-legend-blue" />
             <span className="font-display text-2xl text-gray-800">Little Legends</span>
           </Link>
           <div className="animate-pulse bg-gray-200 h-8 w-24 rounded"></div>
@@ -45,10 +46,10 @@ const Navbar = () => {
     console.error("Error accessing auth context:", error);
     setAuthError(error instanceof Error ? error.message : "Auth context error");
     return (
-      <nav className="w-full py-4 px-4 md:px-8 bg-white/80 backdrop-blur-sm border-b sticky top-0 z-50">
+      <nav className="w-full py-4 px-4 md:px-8 bg-white sticky top-0 z-50">
         <div className="container mx-auto flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
-            <BookOpen className="h-8 w-8 text-red-500" />
+            <BookOpen className="h-6 w-6 text-legend-blue" />
             <span className="font-display text-2xl text-gray-800">Little Legends</span>
           </Link>
           <div className="text-xs text-red-500">Auth error: Reloading in 5s</div>
@@ -65,11 +66,11 @@ const Navbar = () => {
 
   // Rest of the component can now safely use auth
   return (
-    <nav className="w-full py-4 px-4 md:px-8 bg-white/80 backdrop-blur-sm border-b sticky top-0 z-50">
+    <nav className="w-full py-4 px-4 md:px-8 bg-white sticky top-0 z-50">
       <div className="container mx-auto flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
-          <BookOpen className="h-8 w-8 text-legend-blue" />
-          <span className="font-display text-2xl text-gray-800">Little Legends</span>
+          <BookOpen className="h-6 w-6 text-legend-blue" />
+          <span className="font-display text-xl text-gray-800">Little Legends</span>
         </Link>
         
         <div className="hidden md:flex items-center gap-6">
@@ -81,7 +82,7 @@ const Navbar = () => {
           </Link>
           
           <Link to="/create">
-            <Button className="bg-legend-blue hover:bg-blue-500 text-white rounded-full px-6">
+            <Button className="bg-legend-blue hover:bg-blue-400 text-white rounded-full px-6">
               Create Story
             </Button>
           </Link>
@@ -141,7 +142,7 @@ const Navbar = () => {
             </DropdownMenu>
           ) : (
             <Link to="/auth">
-              <Button variant="outline" className="rounded-full px-6 border-legend-blue text-legend-blue hover:bg-legend-blue hover:text-white">
+              <Button variant="outline" className="rounded-full px-6 border border-gray-300 text-gray-600 hover:border-legend-blue hover:text-legend-blue">
                 Login
               </Button>
             </Link>

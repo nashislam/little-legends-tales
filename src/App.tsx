@@ -27,7 +27,7 @@ function App() {
   }, [location.pathname]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen flex flex-col bg-white">
       <VersionChecker />
       <Routes>
         <Route path="/" element={<Index />} />
