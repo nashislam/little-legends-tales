@@ -8,7 +8,61 @@ const VersionChecker = () => {
   useVersionCheck(10000);
   
   useEffect(() => {
-    console.log("VersionChecker mounted - checking for updates");
+    console.log("VersionChecker mounted - checking for updates and CSS");
+    
+    // Add a CSS check indicator
+    const cssCheckIndicator = document.createElement('div');
+    cssCheckIndicator.style.position = 'fixed';
+    cssCheckIndicator.style.bottom = '15px';
+    cssCheckIndicator.style.right = '2px';
+    cssCheckIndicator.style.fontSize = '8px';
+    cssCheckIndicator.style.color = '#0000ff';
+    cssCheckIndicator.style.zIndex = '10000';
+    cssCheckIndicator.textContent = 'CSS ✓';
+    document.body.appendChild(cssCheckIndicator);
+    
+    // Force a quick CSS reload by removing and re-adding stylesheet
+    const stylesheets = document.querySelectorAll('link[rel="stylesheet"]');
+    stylesheets.forEach(sheet => {
+      const parent = sheet.parentNode;
+      if (parent) {
+        const href = sheet.getAttribute('href');
+        if (href && !href.includes('fonts.googleapis')) {
+          const newSheet = document.createElement('link');
+          newSheet.rel = 'stylesheet';
+          newSheet.href = href + '?v=' + Date.now();
+          parent.replaceChild(newSheet, sheet);
+          console.log("Forced reload of stylesheet:", href);
+        }
+      }
+    });
+    
+    // Create inline style to ensure basic styling is present
+    const inlineStyle = document.createElement('style');
+    inlineStyle.textContent = `
+      body { 
+        font-family: 'Open Sans', sans-serif; 
+        background-color: #f5fafd;
+        color: #2d3748;
+      }
+      .font-display { 
+        font-family: 'Fredoka One', cursive; 
+      }
+      .bg-legend-blue {
+        background-color: #7CC6FE;
+      }
+      .text-legend-blue {
+        color: #7CC6FE;
+      }
+      .bg-legend-pink {
+        background-color: #FF9CC2;
+      }
+      .text-legend-pink {
+        color: #FF9CC2;
+      }
+    `;
+    document.head.appendChild(inlineStyle);
+    console.log("Added emergency inline styles");
     
     // Force a version check on first load with aggressive cache busting
     const checkInitialVersion = async () => {
@@ -86,7 +140,7 @@ const VersionChecker = () => {
     versionIndicator.style.fontSize = '8px';
     versionIndicator.style.color = '#aaa';
     versionIndicator.style.zIndex = '9999';
-    versionIndicator.textContent = `v1.0.6`;
+    versionIndicator.textContent = `v1.0.7`;
     document.body.appendChild(versionIndicator);
     
     window.addEventListener('pageshow', handlePageShow);
@@ -101,10 +155,26 @@ const VersionChecker = () => {
       });
     }
     
+    // Clear any application caches
+    if ('caches' in window) {
+      caches.keys().then(cacheNames => {
+        cacheNames.forEach(cacheName => {
+          caches.delete(cacheName);
+          console.log('Cache deleted:', cacheName);
+        });
+      });
+    }
+    
     return () => {
       window.removeEventListener('pageshow', handlePageShow);
       if (document.body.contains(versionIndicator)) {
         document.body.removeChild(versionIndicator);
+      }
+      if (document.body.contains(cssCheckIndicator)) {
+        document.body.removeChild(cssCheckIndicator);
+      }
+      if (document.head.contains(inlineStyle)) {
+        document.head.removeChild(inlineStyle);
       }
     };
   }, []);

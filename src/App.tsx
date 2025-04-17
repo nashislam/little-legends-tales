@@ -3,6 +3,7 @@ import { Routes, Route, useLocation } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
 import VersionChecker from "@/components/VersionChecker";
 import "./App.css";
+import "./index.css"; // Explicitly import index.css here as well
 
 // Import components
 import Navbar from "./components/Navbar";
