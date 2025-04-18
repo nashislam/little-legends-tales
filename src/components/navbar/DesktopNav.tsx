@@ -17,7 +17,7 @@ const DesktopNav = () => {
       </Link>
       
       <Link to="/create">
-        <Button className="bg-legend-blue hover:bg-blue-400 text-white rounded-full px-6">
+        <Button className="bg-legend-blue hover:bg-blue-400 text-white rounded-full px-6" size="lg">
           Create Story
         </Button>
       </Link>
@@ -26,7 +26,7 @@ const DesktopNav = () => {
         <UserMenu email={user.email || 'User'} isAdmin={user.email === 'nasheet.islam@gmail.com'} />
       ) : (
         <Link to="/auth">
-          <Button variant="outline" className="rounded-full px-6 border border-gray-300 text-gray-600 hover:border-legend-blue hover:text-legend-blue">
+          <Button variant="outline" size="lg" className="rounded-full px-6 border border-gray-300 text-gray-600 hover:border-legend-blue hover:text-legend-blue">
             Login
           </Button>
         </Link>
