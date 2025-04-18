@@ -8,9 +8,9 @@ const MobileNav = () => {
   const { user } = useAuth();
 
   return (
-    <div className="md:hidden flex items-center gap-3">
+    <div className="md:hidden flex items-center gap-2">
       <Link to="/create">
-        <Button className="bg-legend-blue hover:bg-blue-400 text-white rounded-full" size="sm">
+        <Button className="bg-blue-500 hover:bg-blue-600 text-white" size="sm">
           Create
         </Button>
       </Link>
@@ -19,7 +19,7 @@ const MobileNav = () => {
         <UserMenu email={user.email || 'User'} isAdmin={user.email === 'nasheet.islam@gmail.com'} />
       ) : (
         <Link to="/auth" className="md:hidden">
-          <Button variant="outline" className="rounded-full" size="sm">
+          <Button variant="outline" className="border border-gray-300 text-gray-600" size="sm">
             Login
           </Button>
         </Link>

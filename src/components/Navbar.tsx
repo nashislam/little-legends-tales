@@ -16,8 +16,8 @@ const Navbar = () => {
   // Early return with simple navbar if not mounted yet
   if (!mounted) {
     return (
-      <nav className="w-full py-4 px-4 md:px-8 bg-white border-b border-gray-100 shadow-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
+      <nav className="w-full py-3 px-4 md:px-6 bg-white border-b border-gray-100 sticky top-0 z-50">
+        <div className="container mx-auto flex items-center justify-between">
           <Logo />
           <div className="animate-pulse bg-gray-200 h-8 w-24 rounded"></div>
         </div>
@@ -34,8 +34,8 @@ const Navbar = () => {
     console.error("Error accessing auth context:", error);
     setAuthError(error instanceof Error ? error.message : "Auth context error");
     return (
-      <nav className="w-full py-4 px-4 md:px-8 bg-white border-b border-gray-100 shadow-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
+      <nav className="w-full py-3 px-4 md:px-6 bg-white border-b border-gray-100 sticky top-0 z-50">
+        <div className="container mx-auto flex items-center justify-between">
           <Logo />
           <div className="text-xs text-red-500">Auth error: Reloading in 5s</div>
         </div>
@@ -44,8 +44,8 @@ const Navbar = () => {
   }
 
   return (
-    <nav className="w-full py-4 px-4 md:px-8 bg-white border-b border-gray-100 shadow-sm sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto flex items-center justify-between">
+    <nav className="w-full py-3 px-4 md:px-6 bg-white border-b border-gray-100 sticky top-0 z-50">
+      <div className="container mx-auto flex items-center justify-between">
         <Logo />
         <DesktopNav />
         <MobileNav />
