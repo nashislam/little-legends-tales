@@ -20,7 +20,7 @@ const DesktopNav = () => {
       </Link>
       
       {user ? (
-        <UserMenu email={user.email || 'User'} isAdmin={user.email === 'nashtyrhymes@gmail.com'} />
+        <UserMenu email={user.email || 'User'} isAdmin={user.email === 'nasheet.islam@gmail.com'} />
       ) : (
         <Link to="/auth" className="text-gray-600 font-medium text-base">
           Login
