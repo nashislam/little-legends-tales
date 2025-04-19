@@ -5,8 +5,8 @@ import { BookOpen } from "lucide-react";
 const Logo = () => {
   return (
     <Link to="/" className="flex items-center gap-2">
-      <BookOpen className="h-6 w-6 text-gray-700" />
-      <span className="font-display text-xl text-gray-700">Little Legends</span>
+      <BookOpen className="h-7 w-7 text-purple-600" />
+      <span className="font-display text-2xl text-purple-600">Little Legends</span>
     </Link>
   );
 };

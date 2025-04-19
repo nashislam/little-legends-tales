@@ -10,7 +10,7 @@ const MobileNav = () => {
   return (
     <div className="md:hidden flex items-center gap-4">
       <Link to="/create">
-        <Button className="bg-[#7CC6FE] hover:bg-[#60B8F8] text-white rounded-full px-4" size="sm">
+        <Button className="bg-purple-600 hover:bg-purple-700 text-white rounded-full px-4 font-medium" size="sm">
           Create
         </Button>
       </Link>
@@ -19,7 +19,7 @@ const MobileNav = () => {
         <UserMenu email={user.email || 'User'} isAdmin={user.email === 'nasheet.islam@gmail.com'} />
       ) : (
         <Link to="/auth">
-          <Button variant="ghost" size="sm" className="text-gray-600">
+          <Button variant="ghost" size="sm" className="text-purple-900 font-medium hover:text-purple-700">
             Login
           </Button>
         </Link>

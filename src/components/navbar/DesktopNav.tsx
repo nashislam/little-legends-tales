@@ -8,16 +8,16 @@ const DesktopNav = () => {
   const { user } = useAuth();
 
   return (
-    <div className="hidden md:flex items-center gap-8">
-      <Link to="/" className="text-gray-600 hover:text-gray-900 transition-colors text-sm">
+    <div className="hidden md:flex items-center gap-6">
+      <Link to="/" className="text-purple-900 hover:text-purple-700 font-medium transition-colors text-sm">
         Home
       </Link>
-      <Link to="/how-it-works" className="text-gray-600 hover:text-gray-900 transition-colors text-sm">
+      <Link to="/how-it-works" className="text-purple-900 hover:text-purple-700 font-medium transition-colors text-sm">
         How It Works
       </Link>
       
       <Link to="/create">
-        <Button className="bg-[#7CC6FE] hover:bg-[#60B8F8] text-white rounded-full px-6" size="sm">
+        <Button className="bg-purple-600 hover:bg-purple-700 text-white rounded-full px-6 font-medium">
           Create Story
         </Button>
       </Link>
@@ -26,7 +26,7 @@ const DesktopNav = () => {
         <UserMenu email={user.email || 'User'} isAdmin={user.email === 'nasheet.islam@gmail.com'} />
       ) : (
         <Link to="/auth">
-          <Button variant="ghost" size="sm" className="text-gray-600">
+          <Button variant="ghost" className="text-purple-900 font-medium hover:text-purple-700 hover:bg-purple-50">
             Login
           </Button>
         </Link>

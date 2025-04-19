@@ -24,7 +24,7 @@ const StoryActions = ({
     <div className="flex flex-col md:flex-row justify-center gap-4 mt-8">
       <Button 
         onClick={onSave}
-        className="bg-legend-blue hover:bg-blue-600 text-white flex items-center gap-2"
+        className="bg-purple-600 hover:bg-purple-700 text-white flex items-center gap-2 font-medium"
         disabled={saving || storySaved}
       >
         <Save size={18} />
@@ -33,7 +33,7 @@ const StoryActions = ({
       
       <Button 
         onClick={onDownload}
-        className="flex items-center gap-2"
+        className="flex items-center gap-2 font-medium"
         variant="outline"
         disabled={downloading}
       >
@@ -44,7 +44,7 @@ const StoryActions = ({
       <Button 
         onClick={() => navigate("/create")}
         variant="outline"
-        className="border-2 border-legend-pink text-legend-pink hover:bg-legend-pink hover:text-white"
+        className="border-2 border-purple-200 text-purple-800 hover:bg-purple-50 hover:text-purple-700 font-medium"
       >
         Create Another Story
       </Button>
