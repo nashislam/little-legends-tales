@@ -142,6 +142,7 @@ export type Database = {
           favorite_animal: string | null
           id: string
           magical_power: string | null
+          title: string | null
           user_id: string | null
         }
         Insert: {
@@ -154,6 +155,7 @@ export type Database = {
           favorite_animal?: string | null
           id?: string
           magical_power?: string | null
+          title?: string | null
           user_id?: string | null
         }
         Update: {
@@ -166,9 +168,45 @@ export type Database = {
           favorite_animal?: string | null
           id?: string
           magical_power?: string | null
+          title?: string | null
           user_id?: string | null
         }
         Relationships: []
+      }
+      story_pages: {
+        Row: {
+          created_at: string | null
+          id: string
+          image_url: string | null
+          page_number: number
+          story_id: string | null
+          text_content: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          image_url?: string | null
+          page_number: number
+          story_id?: string | null
+          text_content: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          image_url?: string | null
+          page_number?: number
+          story_id?: string | null
+          text_content?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "story_pages_story_id_fkey"
+            columns: ["story_id"]
+            isOneToOne: false
+            referencedRelation: "stories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_preferences: {
         Row: {

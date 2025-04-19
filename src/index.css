@@ -1,4 +1,3 @@
-
 @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Open+Sans:wght@400;500;600;700&family=Comic+Neue:wght@400;700&display=swap');
 
 @tailwind base;
@@ -126,6 +125,23 @@
     width: 3px;
     background: linear-gradient(to right, rgba(0,0,0,0.1), rgba(0,0,0,0));
     z-index: 2;
+  }
+
+  .starry-bg {
+    background: linear-gradient(to bottom, #1a1f2c 0%, #2d3859 100%);
+    background-image: radial-gradient(white 1px, transparent 1px);
+    background-size: 50px 50px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .floating {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
   }
 }
 
