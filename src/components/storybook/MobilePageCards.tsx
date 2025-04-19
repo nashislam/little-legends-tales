@@ -79,39 +79,44 @@ const MobilePageCards = ({
         aria-live="polite"
       ></div>
       
-      <Carousel
-        className="w-full overflow-visible touch-pan-y"
-        opts={{
-          align: "center",
-          loop: false,
-          startIndex: currentPage,
-        }}
-        setApi={setApi}
-      >
-        <CarouselContent className="-ml-2 md:-ml-4">
-          {pages.map((page, index) => (
-            <CarouselItem 
-              key={index} 
-              className="pl-2 md:pl-4 min-w-0 basis-full sm:basis-9/10 md:basis-4/5 lg:basis-3/4"
-            >
-              <MobilePageCard
-                page={page}
-                index={index}
-                currentPage={currentPage}
-                childName={childName}
-                loading={loading[index]}
-                onRetryImage={() => onRetryImage(index)}
-              />
-            </CarouselItem>
-          ))}
-        </CarouselContent>
-        
-        {/* Desktop navigation arrows - hidden on mobile */}
-        <div className="hidden md:block">
-          <CarouselPrevious className="left-4 bg-white/80" />
-          <CarouselNext className="right-4 bg-white/80" />
-        </div>
-      </Carousel>
+      <div className="page-spread mb-8 w-full">
+        <Carousel
+          className="w-full overflow-visible touch-pan-y"
+          opts={{
+            align: "center",
+            loop: false,
+            startIndex: currentPage,
+          }}
+          setApi={setApi}
+        >
+          <CarouselContent className="-ml-2 md:-ml-4">
+            {pages.map((page, index) => (
+              <CarouselItem 
+                key={index} 
+                className="pl-2 md:pl-4 min-w-0 basis-full sm:basis-9/10 md:basis-4/5 lg:basis-3/4"
+              >
+                <div className="page-spread-half">
+                  <div className="page-number">{index + 1}</div>
+                  <MobilePageCard
+                    page={page}
+                    index={index}
+                    currentPage={currentPage}
+                    childName={childName}
+                    loading={loading[index]}
+                    onRetryImage={() => onRetryImage(index)}
+                  />
+                </div>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+          
+          {/* Desktop navigation arrows - hidden on mobile */}
+          <div className="hidden md:block">
+            <CarouselPrevious className="left-4 bg-white/80" />
+            <CarouselNext className="right-4 bg-white/80" />
+          </div>
+        </Carousel>
+      </div>
       
       {/* Mobile-specific navigation buttons - shown at bottom of screen */}
       <div className="flex justify-center mt-6 gap-4 md:hidden">

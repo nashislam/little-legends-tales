@@ -1,6 +1,6 @@
 
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Card, CardContent } from "@/components/ui/card";
+import { Link } from "react-router-dom";
 
 const exampleStories = [
   { title: "Shay's Enchanted Garden", image: "/lovable-uploads/390b8016-b246-4925-8265-8571a9a2969a.png" },
@@ -11,32 +11,30 @@ const exampleStories = [
 
 const BookCarousel = () => {
   return (
-    <Carousel className="w-full max-w-5xl mx-auto">
-      <CarouselContent>
+    <div className="w-full max-w-5xl mx-auto px-6">
+      <h2 className="text-3xl md:text-4xl font-serif mb-8 text-center text-white">Popular Stories</h2>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {exampleStories.map((story, index) => (
-          <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3">
-            <div className="p-2">
-              <Card className="border-2 border-purple-200 bg-white/95 backdrop-blur-sm">
-                <CardContent className="p-4">
-                  <div className="aspect-[4/3] relative rounded-lg overflow-hidden">
-                    <img 
-                      src={story.image} 
-                      alt={story.title}
-                      className="object-cover w-full h-full"
-                    />
-                  </div>
-                  <h3 className="mt-3 text-lg font-display text-purple-900 text-center">
-                    {story.title}
-                  </h3>
-                </CardContent>
-              </Card>
-            </div>
-          </CarouselItem>
+          <Link key={index} to="/create" className="block transform hover:scale-105 transition-transform duration-300">
+            <Card className="story-card border-2 border-purple-cloud/20 overflow-hidden h-full">
+              <div className="aspect-square relative">
+                <img 
+                  src={story.image} 
+                  alt={story.title}
+                  className="object-cover w-full h-full"
+                />
+              </div>
+              <CardContent className="p-4">
+                <h3 className="text-xl font-serif text-gray-800 text-center">
+                  {story.title}
+                </h3>
+              </CardContent>
+            </Card>
+          </Link>
         ))}
-      </CarouselContent>
-      <CarouselPrevious className="hidden md:flex" />
-      <CarouselNext className="hidden md:flex" />
-    </Carousel>
+      </div>
+    </div>
   );
 };
 

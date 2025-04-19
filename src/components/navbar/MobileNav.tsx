@@ -10,7 +10,7 @@ const MobileNav = () => {
   return (
     <div className="md:hidden flex items-center gap-4">
       <Link to="/create">
-        <Button className="bg-[#60A5FA] hover:bg-[#3B82F6] text-white font-medium text-base px-4 py-2 rounded-full">
+        <Button className="bg-primary-teal hover:bg-primary-teal/90 text-white font-semibold text-base px-4 py-2 rounded-xl shadow-sm">
           Create Story
         </Button>
       </Link>

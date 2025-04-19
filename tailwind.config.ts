@@ -20,7 +20,8 @@ export default {
 		},
 		extend: {
 			fontFamily: {
-				sans: ['"Open Sans"', 'sans-serif'],
+				sans: ['Open Sans', 'sans-serif'],
+				serif: ['Merriweather', 'serif'],
 				display: ['"Fredoka One"', 'Quicksand', 'cursive'],
 				story: ['"Comic Neue"', 'Georgia', 'Nunito', 'serif'],
 			},
@@ -32,31 +33,33 @@ export default {
 				foreground: 'hsl(var(--foreground))',
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
-					foreground: 'hsl(var(--primary-foreground))'
+					foreground: 'hsl(var(--primary-foreground))',
+					teal: '#4CB6B8',
 				},
 				secondary: {
 					DEFAULT: 'hsl(var(--secondary))',
-					foreground: 'hsl(var(--secondary-foreground))'
+					foreground: 'hsl(var(--secondary-foreground))',
 				},
 				destructive: {
 					DEFAULT: 'hsl(var(--destructive))',
-					foreground: 'hsl(var(--destructive-foreground))'
+					foreground: 'hsl(var(--destructive-foreground))',
 				},
 				muted: {
 					DEFAULT: 'hsl(var(--muted))',
-					foreground: 'hsl(var(--muted-foreground))'
+					foreground: 'hsl(var(--muted-foreground))',
 				},
 				accent: {
 					DEFAULT: 'hsl(var(--accent))',
-					foreground: 'hsl(var(--accent-foreground))'
+					foreground: 'hsl(var(--accent-foreground))',
+					yellow: '#FCD34D',
 				},
 				popover: {
 					DEFAULT: 'hsl(var(--popover))',
-					foreground: 'hsl(var(--popover-foreground))'
+					foreground: 'hsl(var(--popover-foreground))',
 				},
 				card: {
 					DEFAULT: 'hsl(var(--card))',
-					foreground: 'hsl(var(--card-foreground))'
+					foreground: 'hsl(var(--card-foreground))',
 				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
@@ -70,15 +73,24 @@ export default {
 				},
 				// Little Legends custom colors
 				"legend-blue": "#7CC6FE",
-				"legend-pink": "#FF9CC2",
+				"legend-pink": "#FF9CC2", 
 				"legend-yellow": "#FFD966",
 				"legend-green": "#96E6B3",
 				"legend-purple": "#D6BCFA",
+				// New color palette
+				"cream-paper": "#FFF8E7",
+				"pink-cloud": "#FBCFE8",
+				"purple-cloud": "#C7D2FE",
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
-				sm: 'calc(var(--radius) - 4px)'
+				sm: 'calc(var(--radius) - 4px)',
+				xl: '1.5rem',
+				'2xl': '2rem',
+			},
+			boxShadow: {
+				card: '0 8px 16px rgba(0,0,0,0.1)',
 			},
 			keyframes: {
 				"accordion-down": {
