@@ -1,10 +1,10 @@
 
-import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 const Hero = () => {
   return (
-    <div className="text-center space-y-6 relative z-10">
+    <div className="relative text-center space-y-6 z-10">
       <h1 className="text-5xl md:text-7xl font-display text-white leading-tight">
         Every Child is a
         <span className="block bg-gradient-to-r from-purple-300 to-pink-300 text-transparent bg-clip-text">
